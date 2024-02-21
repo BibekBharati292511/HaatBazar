@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+
+class CustomButton extends StatelessWidget {
+  final String buttonText;
+  final VoidCallback onPressed;
+
+  const CustomButton({
+    Key? key,
+    required this.buttonText,
+    required this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 100.0, vertical: 10.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.7,
+        height: MediaQuery.of(context).size.height * 0.07,
+        padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 1.0),
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF003F12),
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6.0),
+            ),
+          ),
+          child: Text(
+            buttonText,
+            style: const TextStyle(color: Colors.white, fontSize: 18),
+          ),
+        ),
+      ),
+    );
+  }
+}
