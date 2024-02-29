@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hatbazarsample/HomePage/productPageBody.dart';
 import 'package:hatbazarsample/SellerCenter/HomePage/toDoListSeller.dart';
 
 class SellerBottomNavigation extends StatefulWidget {
-  const SellerBottomNavigation({Key? key}) : super(key: key);
+  const SellerBottomNavigation({super.key});
 
   @override
   _SellerBottomNavigationState createState() => _SellerBottomNavigationState();
@@ -15,7 +14,7 @@ class _SellerBottomNavigationState extends State<SellerBottomNavigation> {
   TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static const List<Widget> _widgetOptions = <Widget>[
     //body
-    const SingleChildScrollView(
+    SingleChildScrollView(
       child: ToDoListSeller(),
     ),
     Text(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyAlertDialog extends StatelessWidget {
@@ -6,7 +5,7 @@ class MyAlertDialog extends StatelessWidget {
   final String content;
   final List<Widget> actions;
 
-  MyAlertDialog({
+  const MyAlertDialog({super.key, 
     required this.title,
     required this.content,
     this.actions = const [],
@@ -16,12 +15,12 @@ class MyAlertDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        this.title,
+        title,
         style: Theme.of(context).textTheme.titleLarge,
       ),
-      actions: this.actions,
+      actions: actions,
       content: Text(
-        this.content,
+        content,
         style: Theme.of(context).textTheme.bodyMedium,
       ),
     );

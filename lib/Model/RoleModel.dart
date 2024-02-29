@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:hatbazarsample/Utilities/constant.dart';
 import 'package:http/http.dart' as http;
 
 class Role {
@@ -16,7 +17,7 @@ class Role {
 }
 
 Future<List<Role>> fetchRoles() async {
-  final url = Uri.parse("http://172.24.32.1:8080/user/getUserRole");
+  final url = Uri.parse('${serverBaseUrl}user/getUserRole');
 
   try {
     final response = await http.get(

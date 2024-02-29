@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hatbazarsample/HomePage/productPageBody.dart';
 
 class BottomWidget extends StatefulWidget {
-  const BottomWidget({Key? key}) : super(key: key);
+  const BottomWidget({super.key});
 
   @override
   _BottomWidgetState createState() => _BottomWidgetState();

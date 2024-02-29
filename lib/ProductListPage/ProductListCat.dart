@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hatbazarsample/ProductCard/bigProductCardWidget.dart';
 
@@ -7,7 +6,7 @@ import '../Utilities/colors.dart';
 import '../Widgets/smallText.dart';
 
 class ProductListCat extends StatefulWidget {
-  const ProductListCat({Key? key}) : super(key: key);
+  const ProductListCat({super.key});
 
   @override
   State<ProductListCat> createState() => _ProductListCatState();
@@ -27,7 +26,7 @@ class _ProductListCatState extends State<ProductListCat> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.pop(context); // Navigate back
                   },
@@ -86,7 +85,7 @@ class _ProductListCatState extends State<ProductListCat> {
               ],
             ),
             SizedBox(height: ResponsiveDim.height10),
-            Expanded(
+            const Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [

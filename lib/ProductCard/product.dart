@@ -3,7 +3,6 @@ import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 import 'package:hatbazarsample/Widgets/bigText.dart';
 import 'package:hatbazarsample/Widgets/smallText.dart';
 
-import 'bigProductCardWidget.dart';
 import '../ProductListPage/ProductListCat.dart';
 
 class Product {

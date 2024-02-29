@@ -6,11 +6,11 @@ class RadioBox extends StatelessWidget {
   final ValueChanged<String?>? onChanged;
 
   const RadioBox({
-    Key? key,
+    super.key,
     required this.options,
     required this.selectedOption,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

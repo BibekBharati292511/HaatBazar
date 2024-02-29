@@ -1,24 +1,34 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hatbazarsample/SellerCenter/HomePage/seller_bottom_navigation.dart';
+import 'package:hatbazarsample/Widgets/profile_image_widget.dart';
+import 'package:hatbazarsample/main.dart';
 
-import '../../HomePage/bottom_navigation.dart';
-import '../../HomePage/main_drawer.dart';
+import '../../Model/ProfileCompletionTracker.dart';
 import '../../Utilities/ResponsiveDim.dart';
 import '../../Utilities/colors.dart';
 import '../../Widgets/bigText.dart';
-import '../../Widgets/smallText.dart';
 
 class SellerCenterMain extends StatefulWidget {
   const SellerCenterMain({super.key});
 
   @override
   State<SellerCenterMain> createState() => _SellerCenterMainState();
+
 }
+
 
 class _SellerCenterMainState extends State<SellerCenterMain> {
   @override
+  void initState() {
+    print("i am running");
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await ProfileCompletionTracker.profileCompletionTracker();
+    });
+  }
+  @override
   Widget build(BuildContext context) {
+   // print("height: " + MediaQuery.of(context).size.height.toString());
     return Scaffold(
       body: Column(
         children: [
@@ -33,21 +43,7 @@ class _SellerCenterMainState extends State<SellerCenterMain> {
             elevation: 0,
             title: Row( // Use Row here instead of Expanded directly
               children: [
-                GestureDetector(
-                  onTap: () {
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/profile_image.png',
-                        width: ResponsiveDim.icon44,
-                        height: ResponsiveDim.icon44,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
+                ProfileImage(bytes:bytes),
                 Expanded( // Place Expanded inside Row
                   child: Container(
                     padding: EdgeInsets.only(left: ResponsiveDim.radius6),
@@ -75,7 +71,7 @@ class _SellerCenterMainState extends State<SellerCenterMain> {
                       right: 0,
                       top: 0,
                       child: Container(
-                        padding: EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2),
                         decoration: const BoxDecoration(
                           color: AppColors.primaryColor,
                           shape: BoxShape.circle,

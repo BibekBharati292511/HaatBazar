@@ -5,12 +5,13 @@ import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
 
 import '../Utilities/ResponsiveDim.dart';
+import '../Utilities/constant.dart';
 import '../Widgets/alertBoxWidget.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/progress_indicator.dart';
 
 class ChangePassword extends StatefulWidget {
-  const ChangePassword({Key? key}) : super(key: key);
+  const ChangePassword({super.key});
 
   @override
   State<ChangePassword> createState() => _ChangePasswordState();
@@ -29,7 +30,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   }
 
   Future<void> changePasswords(String password) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/changePassword");
+    final url = Uri.parse("${serverBaseUrl}user/changePassword");
 
     try {
       final response = await http.put(
@@ -69,7 +70,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                   onPressed: () {
                     Navigator.pushNamed(context, 'login');
                   },
-                  child: Text('Log in'),
+                  child: const Text('Log in'),
                 ),
               ],
             );
@@ -95,7 +96,7 @@ class _ChangePasswordState extends State<ChangePassword> {
       child: Scaffold(
         body: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: buildLoginContainer(),
             ),
@@ -132,12 +133,12 @@ class _ChangePasswordState extends State<ChangePassword> {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.pop(context); // Navigate back
                   },
                 ),
-                Expanded(
+                const Expanded(
                   child: Text(
                     'Change Password',
                     textAlign: TextAlign.center,
@@ -151,7 +152,7 @@ class _ChangePasswordState extends State<ChangePassword> {
               ],
             ),
             SizedBox(height: ResponsiveDim.height20),
-            ProgressIndicators(currentPage: 3, totalPages: 3),
+            const ProgressIndicators(currentPage: 3, totalPages: 3),
             SizedBox(height: ResponsiveDim.height20),
             Text(
               'Enter new password for ',
@@ -288,7 +289,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 context: context,
                 barrierDismissible: true,
                 builder: (BuildContext dialogContext) {
-                  return MyAlertDialog(title: 'Error', content: 'Passwords do not match');
+                  return const MyAlertDialog(title: 'Error', content: 'Passwords do not match');
                 },
               );
             }

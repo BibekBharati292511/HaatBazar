@@ -1,8 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hatbazarsample/SignUp/create_customer_account.dart';
 import 'package:hatbazarsample/Widgets/progress_indicator.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
@@ -12,11 +10,10 @@ import '../Widgets/alertBoxWidget.dart';
 import '../Widgets/custom_button.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/login_container.dart';
-import '../Widgets/radio_box.dart';
 
 class VerifyCustomerUser extends StatefulWidget {
 
-  const VerifyCustomerUser({Key? key}) : super(key: key);
+  const VerifyCustomerUser({super.key});
 
   @override
   State<VerifyCustomerUser> createState() => _VerifyCustomerUserState();
@@ -53,6 +50,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
 
         // Check if the response indicates that the user already exists
         if (responseData['status'] == 'Error') {
+          if (!context.mounted) return;
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -64,6 +62,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
             },
           );
         }
+        if (!context.mounted) return;
         showDialog(
           context: context,
           barrierDismissible: true,
@@ -76,7 +75,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
                   onPressed: () {
                     Navigator.pushNamed(context, 'login');
                   },
-                  child: Text('Log in'),
+                  child: const Text('Log in'),
                 ),
               ],
             );
@@ -106,7 +105,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: LoginContainer(
                 children: <Widget>[
@@ -114,7 +113,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back),
                         onPressed: () {
                           Navigator.pop(context); // Navigate back
                         },
@@ -134,7 +133,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
                     ],
                   ),
                   SizedBox(height: ResponsiveDim.height20),
-                  ProgressIndicators(currentPage: 3, totalPages: 3),
+                  const ProgressIndicators(currentPage: 3, totalPages: 3),
 
                   SizedBox(height:  ResponsiveDim.height20,),
                   Text(
@@ -174,11 +173,11 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
                     ),
                     child: TextField(
                       controller: otpController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Enter OTP', // Label//
                         contentPadding: EdgeInsets.all(8.0),
                       ),
-                      style: TextStyle(color: Colors.blue),
+                      style: const TextStyle(color: Colors.blue),
                     ),
                   ),
                   SizedBox(height: ResponsiveDim.height15,),

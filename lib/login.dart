@@ -2,15 +2,21 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/Model/UserAddress.dart';
+import 'package:hatbazarsample/Model/UserData.dart';
+import 'package:hatbazarsample/Model/addressTracker.dart';
 import 'package:http/http.dart' as http;
 
+import 'Model/ProfileCompletionTracker.dart';
 import 'Utilities/ResponsiveDim.dart';
+import 'Utilities/constant.dart';
 import 'Widgets/LoadingWidget.dart';
 import 'Widgets/alertBoxWidget.dart';
-import 'package:sign_in_button/sign_in_button.dart';
+
+import 'main.dart';
 
 class MyLogin extends StatefulWidget {
-  const MyLogin({Key? key}) : super(key: key);
+  const MyLogin({super.key});
 
   @override
   State<MyLogin> createState() => _MyLoginState();
@@ -45,7 +51,6 @@ class _MyLoginState extends State<MyLogin> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _isLoading = false;
-
   @override
   void dispose() {
     emailController.dispose();
@@ -54,7 +59,7 @@ class _MyLoginState extends State<MyLogin> {
   }
 
   Future<void> signIn(String email, String password) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/signIn");
+    final url = Uri.parse("${serverBaseUrl}user/signIn");
 
     setState(() {
       _isLoading = true;
@@ -75,7 +80,23 @@ class _MyLoginState extends State<MyLogin> {
       if (response.statusCode == 200) {
         String token = responseBody["token"] as String;
         String role=responseBody["role"] as String;
-        print(token);
+        userToken=token;
+        await UserDataService.fetchUserData(token).then((userData) {
+          userDataJson = jsonDecode(userData);
+        });
+        print(userDataJson);
+        await AddressTracker.addressTracker();
+        await ProfileCompletionTracker.profileCompletionTracker();
+        if(isAddAddressCompleted==true) {
+          await UserAddressService.fetchUserAddress(userDataJson["id"]).then((userAddress) {
+            userAddressJson = jsonDecode(userAddress);
+          });
+          print('runnong usr address');
+          userAddress = userAddressJson["address"];
+        }
+        print("address detail is ");
+        print(userDataJson["id"]);
+        if (!context.mounted) return;
         if(role=="Buyers"){
           Navigator.pushNamed(context, 'homePage');
         }
@@ -83,6 +104,7 @@ class _MyLoginState extends State<MyLogin> {
           Navigator.pushNamed(context, 'sellerHomePage');
         }
       } else {
+        if (!context.mounted) return;
         showDialog(
           context: context,
           barrierDismissible: true,
@@ -94,12 +116,12 @@ class _MyLoginState extends State<MyLogin> {
           },
         );
       }
-    } on SocketException {
+    } on SocketException catch(e) {
       showDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext dialogContext) {
-          return MyAlertDialog(title: 'Error', content: 'Network Error');
+          return MyAlertDialog(title: 'Error', content: 'Network Error: $e');
         },
       );
     } on HttpException catch (e) {
@@ -109,7 +131,7 @@ class _MyLoginState extends State<MyLogin> {
         builder: (BuildContext dialogContext) {
           return MyAlertDialog(
             title: 'Error',
-            content: 'Your request is unavailable right now',
+            content: 'Your request is unavailable right now $e',
           );
         },
       );
@@ -119,6 +141,7 @@ class _MyLoginState extends State<MyLogin> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +153,7 @@ class _MyLoginState extends State<MyLogin> {
           children: [
             widget.buildBackgroundImage(context),
             Center(
-              child: _isLoading ? LoadingWidget() : buildLoginContainer(),
+              child: _isLoading ? const LoadingWidget() : buildLoginContainer(),
             ),
           ],
         ),
@@ -178,6 +201,7 @@ class _MyLoginState extends State<MyLogin> {
             buildDividerWithOrText(),
             buildCreateAccountButton(),
             buildGoogleLoginButton(context),
+            SizedBox(height: ResponsiveDim.height250,)
 
           ],
         ),
@@ -274,7 +298,14 @@ class _MyLoginState extends State<MyLogin> {
           onPressed: () async {
             String password = passwordController.text;
             String email = emailController.text;
+            userEmail=email;
             await signIn(email, password);
+             {
+              await UserDataService.fetchUserData(userToken!).then((userData) {
+                userDataJson = jsonDecode(userData);
+                bytes=base64Decode(userDataJson["image"]);
+              });
+            }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF003F12),
@@ -385,9 +416,8 @@ class _MyLoginState extends State<MyLogin> {
                 'Login with Google',
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 15,
-                  fontFamily: "poppins",
                   fontWeight: FontWeight.bold,
+                  fontFamily: "poppins"
                 ),
               ),
             ],

@@ -1,17 +1,17 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
 
 import '../Utilities/ResponsiveDim.dart';
+import '../Utilities/constant.dart';
 import '../Widgets/alertBoxWidget.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/progress_indicator.dart';
 
 class CreateUserAccount extends StatefulWidget {
-  const CreateUserAccount({Key? key}) : super(key: key);
+  const CreateUserAccount({super.key});
 
   @override
   State<CreateUserAccount> createState() => _CreateUserAccountState();
@@ -38,7 +38,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
 
   Future<void> createUserAccounts(
       String firstName, String lastName, String email, String password,int roleId) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/signup");
+    final url = Uri.parse("$serverBaseUrl/user/signup");
 
     try {
       final response = await http.post(
@@ -59,6 +59,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
 
         // Check if the response indicates that the user already exists
         if (responseData['status'] == 'Error') {
+          if (!context.mounted) return;
           showDialog(
             context: context,
             barrierDismissible: true,
@@ -70,7 +71,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
             },
           );
         } else {
-          // Proceed to the verification page
+          if (!context.mounted) return;
           Navigator.pushNamed(context, 'verifyCustomerUser');
           firstController.clear();
           lastController.clear();
@@ -114,7 +115,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
       child: Scaffold(
         body: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: buildLoginContainer(),
             ),
@@ -151,7 +152,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
             Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     Navigator.pop(context); // Navigate back
                   },
@@ -171,7 +172,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
               ],
             ),
             SizedBox(height: ResponsiveDim.height20),
-            ProgressIndicators(currentPage: 2, totalPages: 3),
+            const ProgressIndicators(currentPage: 2, totalPages: 3),
              SizedBox(height: ResponsiveDim.height15),
             buildTextField(
               'Enter your email',
@@ -342,10 +343,10 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
               String email = emailController.text;
               String password = passwordController.text;
               int? roleIds=roleId;
-              print("Email is "+userEmail!);
-              print("firstName is "+firstName);
-              print("other email is "+email);
-              print("pass is "+password);
+              print("Email is ${userEmail!}");
+              print("firstName is $firstName");
+              print("other email is $email");
+              print("pass is $password");
               print(roleIds);
               // Check if email is valid
               if (_validateEmail(email) == null) {
@@ -368,7 +369,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
                 context: context,
                 barrierDismissible: true,
                 builder: (BuildContext dialogContext) {
-                  return MyAlertDialog(title: 'Error', content: 'Passwords do not match');
+                  return const MyAlertDialog(title: 'Error', content: 'Passwords do not match');
                 },
               );
             }
@@ -493,4 +494,5 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
     // Return null if email is valid
     return null;
   }
+
 }

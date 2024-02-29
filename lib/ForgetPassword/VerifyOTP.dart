@@ -1,22 +1,20 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hatbazarsample/SignUp/create_customer_account.dart';
 import 'package:hatbazarsample/Widgets/progress_indicator.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
 
 import '../Utilities/ResponsiveDim.dart';
+import '../Utilities/constant.dart';
 import '../Widgets/alertBoxWidget.dart';
 import '../Widgets/custom_button.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/login_container.dart';
-import '../Widgets/radio_box.dart';
 
 class VerifyOtp extends StatefulWidget {
 
-  const VerifyOtp({Key? key}) : super(key: key);
+  const VerifyOtp({super.key});
 
   @override
   State<VerifyOtp> createState() => _VerifyOtpState();
@@ -37,7 +35,7 @@ class _VerifyOtpState extends State<VerifyOtp> {
 
   Future<void> verifyUserAccounts(
       String otp, String email) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/verifyResetOtp");
+    final url = Uri.parse("${serverBaseUrl}user/verifyResetOtp");
 
     try {
       final response = await http.post(
@@ -91,16 +89,16 @@ class _VerifyOtpState extends State<VerifyOtp> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: LoginContainer(
                 children: <Widget>[
                   SizedBox(height: ResponsiveDim.height45,),
                   Center(
-                    child: AppBar(title: Text("Verify Otp"),),
+                    child: AppBar(title: const Text("Verify Otp"),),
                   ),
                   SizedBox(height:  ResponsiveDim.height20),
-                  ProgressIndicators(currentPage: 2, totalPages: 3),
+                  const ProgressIndicators(currentPage: 2, totalPages: 3),
 
                   SizedBox(height:  ResponsiveDim.height20,),
                   Text(
@@ -140,11 +138,11 @@ class _VerifyOtpState extends State<VerifyOtp> {
                     ),
                     child: TextField(
                       controller: otpController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Enter OTP', // Label//
                         contentPadding: EdgeInsets.all(8.0),
                       ),
-                      style: TextStyle(color: Colors.blue),
+                      style: const TextStyle(color: Colors.blue),
                     ),
                   ),
                   SizedBox(height: ResponsiveDim.height15,),

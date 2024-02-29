@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../Utilities/ResponsiveDim.dart';
 import '../Widgets/custom_button.dart';
@@ -6,12 +5,11 @@ import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/login_container.dart';
 import '../Widgets/progress_indicator.dart';
 import '../Widgets/radio_box.dart';
-import '../Model/RoleModel.dart'; // Import the Role model
-import '../Services/role_service.dart';
-import '../main.dart'; // Import the role service
+import '../Model/RoleModel.dart';
+import '../main.dart';
 
 class RoleSelection extends StatefulWidget {
-  const RoleSelection({Key? key}) : super(key: key);
+  const RoleSelection({super.key});
 
   @override
   State<RoleSelection> createState() => _RoleSelectionState();
@@ -36,7 +34,7 @@ class _RoleSelectionState extends State<RoleSelection> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: LoginContainer(
                 children: <Widget>[
@@ -44,7 +42,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.arrow_back),
                         onPressed: () {
                           Navigator.pop(context); // Navigate back
                         },
@@ -64,7 +62,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                     ],
                   ),
                   SizedBox(height: ResponsiveDim.height20),
-                  ProgressIndicators(currentPage: 1, totalPages: 2),
+                  const ProgressIndicators(currentPage: 1, totalPages: 2),
                   SizedBox(height: ResponsiveDim.height20),
                   const Text(
                     'What do you wish to do in Haat Bazaar?',
@@ -78,7 +76,7 @@ class _RoleSelectionState extends State<RoleSelection> {
                     future: _rolesFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(); // Show a loading indicator while fetching roles
+                        return const CircularProgressIndicator(); // Show a loading indicator while fetching roles
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}'); // Show an error message if fetching roles fails
                       } else {

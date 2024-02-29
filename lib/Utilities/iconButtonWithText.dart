@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 
-import '../Widgets/smallText.dart';
 import 'colors.dart';
 
 class IconButtonWithText extends StatelessWidget {
@@ -17,7 +16,7 @@ class IconButtonWithText extends StatelessWidget {
   final Color iconColor;
 
   const IconButtonWithText({
-    Key? key,
+    super.key,
     this.icon,
     this.buttonText,
     required this.onPressed,
@@ -28,7 +27,7 @@ class IconButtonWithText extends StatelessWidget {
     this.textColor = AppColors.primaryButtonColor,
     this.borderColor = AppColors.primaryButtonColor,
     this.borderRadius = 6,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

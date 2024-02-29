@@ -15,6 +15,7 @@ class ResponsiveDim{
   static double height35= screenHeight/25.43;
   static double height310=screenHeight/2.871;
   static double height250=screenHeight/3.56;
+  static double height5=screenHeight/173.485;
 
 
   //390.428571429
@@ -39,6 +40,7 @@ class ResponsiveDim{
   static double radius30=screenHeight/29.67;
   static double radius15= screenHeight/59.3523;
   static double radius6= screenHeight/148.3809;
+  static double radius8=screenHeight/108.42857;
 
 
   static double icon24= screenHeight/37.09;

@@ -16,7 +16,7 @@ class ProductCardBigWidget extends StatefulWidget {
   final String imagePath;
 
   const ProductCardBigWidget({
-    Key? key,
+    super.key,
     required this.productName,
     required this.description,
     required this.price,
@@ -24,7 +24,7 @@ class ProductCardBigWidget extends StatefulWidget {
     required this.reviewCount,
     required this.producer,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   _ProductCardBigWidgetState createState() => _ProductCardBigWidgetState();
@@ -103,7 +103,7 @@ class _ProductCardBigWidgetState extends State<ProductCardBigWidget> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       BigText(text: widget.productName),
-                      Icon(Icons.arrow_forward_ios),
+                      const Icon(Icons.arrow_forward_ios),
                     ],
                   ),
                   Container(

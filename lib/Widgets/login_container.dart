@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class LoginContainer extends StatelessWidget {
   final List<Widget> children; // Define a parameter to receive column data
 
-  const LoginContainer({Key? key, required this.children}) : super(key: key);
+  const LoginContainer({super.key, required this.children});
 
   @override
   Widget build(BuildContext context) {

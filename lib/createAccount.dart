@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'Widgets/loginBackgroundImage.dart';
 
 class CreateAccount extends StatefulWidget {
-  const CreateAccount({Key? key}) : super(key: key);
+  const CreateAccount({super.key});
 
   @override
   State<CreateAccount> createState() => _CreateAccountState();
@@ -25,7 +25,7 @@ class _CreateAccountState extends State<CreateAccount> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: buildLoginContainer(),
             ),

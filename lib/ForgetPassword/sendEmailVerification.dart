@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../Utilities/ResponsiveDim.dart';
-import '../Utilities/iconButtonWithText.dart';
+import '../Utilities/constant.dart';
 import '../Widgets/alertBoxWidget.dart';
-import '../Widgets/bigText.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/progress_indicator.dart';
 import '../main.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -28,7 +27,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> forgotPasswordScreens(String email) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/sendPassResetOtp");
+    final url = Uri.parse("${serverBaseUrl}user/sendPassResetOtp");
 
     try {
       final response = await http.post(
@@ -81,7 +80,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       child: Scaffold(
         body: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: buildLoginContainer(),
             ),
@@ -100,10 +99,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           children: [
             const SizedBox(height: 12),
             AppBar(
-              title: Text('Forgot Password'),
+              title: const Text('Forgot Password'),
             ),
             SizedBox(height:  ResponsiveDim.height20),
-            ProgressIndicators(currentPage: 1, totalPages: 3),
+            const ProgressIndicators(currentPage: 1, totalPages: 3),
             const Text(
               "Please enter your email address you'd like your password reset info sent to",
               textAlign: TextAlign.center,

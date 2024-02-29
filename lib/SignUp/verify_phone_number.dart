@@ -1,22 +1,95 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:hatbazarsample/Widgets/custom_button.dart';
 import 'package:hatbazarsample/main.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../Model/ProfileCompletionTracker.dart';
+import '../Model/UserData.dart';
 import '../Utilities/ResponsiveDim.dart';
+import '../Utilities/constant.dart';
+import '../Widgets/alertBoxWidget.dart';
 import '../Widgets/loginBackgroundImage.dart';
 import '../Widgets/login_container.dart';
 import '../Widgets/progress_indicator.dart';
+import 'package:http/http.dart' as http;
 
 class VerifyPhoneNumber extends StatefulWidget {
-  const VerifyPhoneNumber({Key? key}) : super(key: key);
+  const VerifyPhoneNumber({super.key});
 
   @override
   State<VerifyPhoneNumber> createState() => _VerifyPhoneNumberState();
 }
 
 class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
+  TextEditingController otpController =TextEditingController();
+  Future<void> setPhoneNumber(String otp) async {
+    final url = Uri.parse("${serverBaseUrl}user/verifyNumberOtp");
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{"Content-Type": "application/json"},
+        body: jsonEncode(<String, Object>{
+          "number":number!,
+          "otp":otp,
+          "email": userEmail!,
+        }),
+      );
+      if (!context.mounted) return;
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
+
+        if (responseData['status'] == 'Error') {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Error',
+                content: responseData['message'],
+              );
+            },
+          );
+        }
+        else{
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext dialogContext) {
+            return MyAlertDialog(
+              title: 'Success',
+              content: "Number set successfully.",
+              actions: [
+                TextButton(
+                  onPressed: () async {
+                    await ProfileCompletionTracker.profileCompletionTracker();
+                    await UserDataService.fetchUserData(userToken!).then((
+                        userData) {
+                      userDataJson = jsonDecode(userData);
+                    });
+                    Navigator.pushNamed(context, 'sellerHomePage');
+                  },
+                  child: const Text('Ok'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+      } else {
+        throw Exception(response.reasonPhrase);
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext dialogContext) {
+          return MyAlertDialog(title: 'Error', content: 'Failed to set Number: $e');
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +99,7 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            LoginBackgroundImage(),
+            const LoginBackgroundImage(),
             Center(
               child: LoginContainer(
                 children: <Widget>[
@@ -37,7 +110,7 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                         onTap: () {
                           Navigator.pop(context); // Navigate to the previous page
                         },
-                        child: Icon(Icons.arrow_back),
+                        child: const Icon(Icons.arrow_back),
                       ),
                     ],
                   ),
@@ -52,7 +125,7 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                     ),
                   ),
                   SizedBox(height:  ResponsiveDim.height20),
-                  ProgressIndicators(currentPage: 2, totalPages: 2),
+                  const ProgressIndicators(currentPage: 2, totalPages: 2),
                   SizedBox(height:  ResponsiveDim.height20,),
                   Text(
                     "Verify Phone Number",
@@ -89,6 +162,7 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                    Padding(
                     padding: EdgeInsets.symmetric(horizontal: ResponsiveDim.width45, vertical: ResponsiveDim.height15),
                     child: TextField(
+                      controller: otpController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(ResponsiveDim.radius30)
@@ -99,8 +173,13 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                   ),
                   CustomButton(
                     buttonText: "Continue",
-                    onPressed: () {
-
+                    onPressed: ()
+                      async {
+                      print(userEmail);
+                      print(number);
+                        String otp = otpController.text;
+                        print(otp);
+                        await setPhoneNumber(otp);
                     },
                   ),
                 ],
