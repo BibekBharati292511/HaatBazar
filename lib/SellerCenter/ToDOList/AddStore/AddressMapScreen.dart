@@ -18,17 +18,17 @@ import '../../../Utilities/constant.dart';
 import '../../../Widgets/alertBoxWidget.dart';
 import '../../../Widgets/bigText.dart';
 import '../../../main.dart';
-import 'location_controller.dart';
-import 'location_search_dialouge.dart';
 import 'package:http/http.dart' as http;
-class MapScreen extends StatefulWidget {
+
+import '../AddAddress/location_search_dialouge.dart';
+class StoreMapScreen extends StatefulWidget {
   final GoogleMapController? googleMapController;
-  const MapScreen({super.key, this.googleMapController});
+  const StoreMapScreen({super.key, this.googleMapController});
 
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  State<StoreMapScreen> createState() => _MapScreenState();
 }
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<StoreMapScreen> {
   late LatLng _initialPosition=LatLng(27.6995091, 85.4840780);
   late GoogleMapController _mapController;
   late CameraPosition _cameraPosition;
@@ -38,17 +38,14 @@ class _MapScreenState extends State<MapScreen> {
     // TODO: implement initState
     super.initState();
     if(Get.find<LocationController>().addressList.isEmpty){
-      _initialPosition=LatLng(isAddAddressCompleted?userAddress["latitude"]:27.6995939, isAddAddressCompleted?userAddress["longitude"]:85.4840471);
+      _initialPosition=LatLng(isStoreAddressCompleted?storeAddress["latitude"]:27.6995939, isStoreAddressCompleted?storeAddress["longitude"]:85.4840471);
       _cameraPosition=CameraPosition(target: _initialPosition,zoom: 17);
     }
-    //else get the data from database and set latitude and longitude
-    //for that we have already called get users data so just check if user address is empty
-    // then set camera position
   }
   @override
   Widget build(BuildContext context) {
-    Future<void> setAddress(
-        final url ,Function method,String country, String county, double latitude, double longitude, String municipality, String state,String cityDistrict,int user_id) async {
+    Future<void> setStoreAddress(
+        final url ,Function method,String country, String county, double latitude, double longitude, String municipality, String state,String cityDistrict,int store_id) async {
 
       try {
         final response = await method(
@@ -62,7 +59,7 @@ class _MapScreenState extends State<MapScreen> {
             "municipality": municipality,
             "state": state,
             "cityDistrict": cityDistrict,
-            "user_id": user_id
+            "store_id": store_id
           }),
         );
 
@@ -104,8 +101,8 @@ class _MapScreenState extends State<MapScreen> {
                           userAddressJson = jsonDecode(userAddress);
                         });
                         userAddress=userAddressJson["address"];
-                        Navigator.pushNamed(context, 'sellerHomePage');
-                        isAddAddressCompleted=true;
+                        Navigator.pushNamed(context, 'addStore');
+                        isStoreAddressCompleted=true;
                       },
                       child: const Text('Ok'),
                     ),
@@ -149,13 +146,13 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ),
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios,size:30,), // Back button icon
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            color: Colors.black, // Icon color
-          ),
+          icon: const Icon(Icons.arrow_back_ios,size:30,), // Back button icon
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          color: Colors.black, // Icon color
         ),
+      ),
       body: GetBuilder<LocationController>(builder: (LocationController){
         return SafeArea(
           child: Center(
@@ -168,12 +165,12 @@ class _MapScreenState extends State<MapScreen> {
                       _cameraPosition=cameraPosition;
                     },
                     onCameraIdle: (){
-                   //   Get.find<LocationController>().updatePosition(_cameraPosition,false);
+                      //   Get.find<LocationController>().updatePosition(_cameraPosition,false);
                       LocationController.updatePosition(_cameraPosition,true);
                     },
                     onMapCreated: (GoogleMapController mapController){
-                    _mapController=mapController;
-                    locationController.setMapController(mapController);
+                      _mapController=mapController;
+                      locationController.setMapController(mapController);
                     },
 
                   ),
@@ -187,7 +184,7 @@ class _MapScreenState extends State<MapScreen> {
                       child:InkWell(
                         onTap: (){
                           print("tsp");
-                       Get.dialog(LocationSearchDialog(mapController: _mapController));
+                          Get.dialog(LocationSearchDialog(mapController: _mapController));
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: ResponsiveDim.width10),
@@ -212,7 +209,7 @@ class _MapScreenState extends State<MapScreen> {
                               Icon(Icons.search,size: 30,color: Colors.yellow,)
                             ],
                           ),
-                        
+
                         ),
                       )
                   ),
@@ -220,10 +217,10 @@ class _MapScreenState extends State<MapScreen> {
                       bottom: 60,
                       left: ResponsiveDim.width20,
                       right:ResponsiveDim.width20,
-                      child: !isAddAddressCompleted?CustomButton(buttonText: 'Add Address', onPressed: () async {
-                        await(setAddress(Uri.parse("${serverBaseUrl}address/add"),http.post,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, userDataJson["id"]));
+                      child: !isStoreAddressCompleted?CustomButton(buttonText: 'Add Address', onPressed: () async {
+                        await(setStoreAddress(Uri.parse("${serverBaseUrl}storeAddress/add"),http.post,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, storeDataJson[0]["id"]));
                       },width:250):CustomButton(buttonText: 'Set new Address', onPressed: () async {
-                        await(setAddress(Uri.parse("${serverBaseUrl}address/updateAddress"),http.put,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, userDataJson["id"]));
+                        await(setStoreAddress(Uri.parse("${serverBaseUrl}storeAddress/updateAddress"),http.put,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, storeDataJson[0]["id"]));
                       },width:250)),
 
                 ],
@@ -232,7 +229,7 @@ class _MapScreenState extends State<MapScreen> {
           ),
         );
 
-    }),
+      }),
     );
   }
 }

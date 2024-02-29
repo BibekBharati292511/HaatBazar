@@ -69,7 +69,7 @@ class _EditNameState extends State<EditName> {
 
         showDialog(
           context: context,
-          barrierDismissible: false,
+          barrierDismissible: true,
           builder: (BuildContext dialogContext) {
             return MyAlertDialog(
               title: 'Success',
@@ -79,14 +79,15 @@ class _EditNameState extends State<EditName> {
                   onPressed: () async {
                     await UserDataService.fetchUserData(userToken!).then((userData) {
                       userDataJson = jsonDecode(userData);
-                      bytes=base64Decode(userDataJson["image"]);
+                      if(userDataJson["image"]!=null) {
+                        bytes = base64Decode(userDataJson["image"]);
+                      }
                     });
-                    Navigator.pushNamed(context, 'sellerHomePage');
                     {
                       await ProfileCompletionTracker.profileCompletionTracker();
 
-                      print(isProfileCompleted);
                     }
+                    Navigator.pushNamed(context, 'sellerHomePage');
                   },
                   child: const Text('Ok'),
                 ),

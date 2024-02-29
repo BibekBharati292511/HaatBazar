@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/Utilities/constant.dart';
 import 'package:hatbazarsample/Widgets/progress_indicator.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
@@ -23,6 +24,7 @@ class VerifyCustomerUser extends StatefulWidget {
 class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
   TextEditingController emailController= TextEditingController();
   TextEditingController otpController=TextEditingController();
+  late final  url;
   int currentPage = 3;
   int totalPages = 3;
   @override
@@ -34,7 +36,11 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
 
   Future<void> verifyUserAccounts(
       String otp, String email) async {
-    final url = Uri.parse("http://172.24.32.1:8080/user/verify");
+    if(fromUser) {
+      url = Uri.parse("${serverBaseUrl}user/verify");
+    }else{
+      url = Uri.parse("${serverBaseUrl}user/verify");
+    }
 
     try {
       final response = await http.post(
@@ -49,7 +55,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
         Map<String, dynamic> responseData = jsonDecode(response.body);
 
         // Check if the response indicates that the user already exists
-        if (responseData['status'] == 'Error') {
+        if (responseData['status'] == 'error') {
           if (!context.mounted) return;
           showDialog(
             context: context,
@@ -61,26 +67,27 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
               );
             },
           );
+        } else {
+          if (!context.mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Success',
+                content: "Registered successfully. Would you like to log in now?",
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, 'login');
+                    },
+                    child: const Text('Log in'),
+                  ),
+                ],
+              );
+            },
+          );
         }
-        if (!context.mounted) return;
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (BuildContext dialogContext) {
-            return MyAlertDialog(
-              title: 'Success',
-              content: "Registered successfully. Would you like to log in now?",
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, 'login');
-                  },
-                  child: const Text('Log in'),
-                ),
-              ],
-            );
-          },
-        );
       }
       else {
         // Handle other status codes (e.g., 400, 500) here
@@ -196,6 +203,7 @@ class _VerifyCustomerUserState extends State<VerifyCustomerUser> {
       buttonText: 'Sign Up',
       onPressed: () async {
         String otp=otpController.text;
+        print(userEmail);
         await verifyUserAccounts(otp,userEmail!);
         otpController.clear();
       },

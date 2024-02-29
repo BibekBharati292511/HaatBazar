@@ -12,7 +12,9 @@ import 'package:hatbazarsample/SellerCenter/HomePage/SellerHomePageMain.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/AddAddress/add_address.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/AddAddress/location_controller.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/AddAddress/map_screen.dart';
-import 'package:hatbazarsample/SellerCenter/ToDOList/AddStore/add_store.dart';
+import 'package:hatbazarsample/SellerCenter/ToDOList/AddStore/AddressMapScreen.dart';
+import 'package:hatbazarsample/SellerCenter/ToDOList/AddStore/add_store_main.dart';
+import 'package:hatbazarsample/SellerCenter/ToDOList/AddStore/delivery_options.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/CompleteProfile/complete_profile_main.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/CompleteProfile/edit_name.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/CompleteProfile/edit_profile_image.dart';
@@ -24,6 +26,9 @@ import 'package:hatbazarsample/HomePage/main_product_page.dart';
 
 
 import 'ForgetPassword/sendEmailVerification.dart';
+import 'SellerCenter/ToDOList/AddStore/create_store.dart';
+import 'SellerCenter/ToDOList/AddStore/store_profile.dart';
+import 'SellerCenter/ToDOList/AddStore/store_type.dart';
 import 'SignUp/create_customer_account.dart';
 import 'SignUp/create_seller_Account.dart';
 String? userEmail;
@@ -31,9 +36,13 @@ String? number;
 String? storeNumber;
 String? userToken;
 int? roleId;
+int? storeTypeId;
 late Map<String, dynamic> userDataJson;
 late Map<String, dynamic> userAddressJson;
 late Map<String, dynamic> userAddress;
+late List<dynamic> storeDataJson;
+late Map<String, dynamic> storeAddressJson;
+late Map<String,dynamic>storeAddress;
 Uint8List? bytes;
 bool isProfileCompleted = false;
 bool isAddAddressCompleted=false;
@@ -42,6 +51,14 @@ bool isAddBankAccountCompleted=false;
 bool isAddProductCompleted=false;
 bool fromUser=true;
 bool fromStore=true;
+
+// store profile tracker
+bool isAddStoreImageCompleted=false;
+bool isStoreProfileCompleted=false;
+bool isStoreAddressCompleted=false;
+bool isStoreDeliveryOptionCompleted=false;
+bool isAddPaymentChoiceCompleted=false;
+bool isAddStoreNumberCompleted=false;
 
 
 Future<void> main() async {
@@ -73,8 +90,13 @@ Future<void> main() async {
       'mapScreen':(context)=>const MapScreen(),
       'addStore':(context)=>const AddStorePage(),
 
+      //add store route
+      'StoreProfile':(context)=>const StoreProfilePage(),
+      'storeType':(context)=> const StoreTypePage(),
+      'createStore':(context)=>const CreateStore(),
+      'storeAddress':(context)=>const StoreMapScreen(),
+      'storeDeliveryOptions':(context)=>const storeDeliveryOptions(),
+
     },
   ));
 }
-
-

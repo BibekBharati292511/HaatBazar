@@ -38,7 +38,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
 
   Future<void> createUserAccounts(
       String firstName, String lastName, String email, String password,int roleId) async {
-    final url = Uri.parse("$serverBaseUrl/user/signup");
+    final url = Uri.parse("${serverBaseUrl}user/signup");
 
     try {
       final response = await http.post(
@@ -78,7 +78,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
         }
       } else {
         // Handle other status codes (e.g., 400, 500) here
-        throw Exception('Failed to create user: ${response.reasonPhrase}');
+        throw Exception('Failed to create user: ${response.body}');
       }
     } catch (e) {
       // Handle network errors here
@@ -351,7 +351,7 @@ class _CreateUserAccountState extends State<CreateUserAccount> {
               // Check if email is valid
               if (_validateEmail(email) == null) {
                 // Proceed with user creation
-                await createUserAccounts(firstName, lastName, email, password,roleIds!);
+                await createUserAccounts(firstName, lastName, userEmail!, password,roleIds!);
                 // Clear text fields
               } else {
                 // Show error dialog for invalid email

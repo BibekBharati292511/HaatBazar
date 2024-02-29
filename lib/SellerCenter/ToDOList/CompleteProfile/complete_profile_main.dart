@@ -25,6 +25,7 @@ class ClickableContainer extends StatelessWidget {
         padding: EdgeInsets.all(ResponsiveDim.height5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(ResponsiveDim.radius6),
+          color: Colors.white
         ),
         child: content,
       ),

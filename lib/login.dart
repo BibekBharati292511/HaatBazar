@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:hatbazarsample/Model/UserAddress.dart';
 import 'package:hatbazarsample/Model/UserData.dart';
 import 'package:hatbazarsample/Model/addressTracker.dart';
+import 'package:hatbazarsample/Model/storeTracker.dart';
 import 'package:http/http.dart' as http;
 
 import 'Model/ProfileCompletionTracker.dart';
+import 'Model/StoreAddress.dart';
 import 'Utilities/ResponsiveDim.dart';
 import 'Utilities/constant.dart';
 import 'Widgets/LoadingWidget.dart';
@@ -83,6 +85,8 @@ class _MyLoginState extends State<MyLogin> {
         userToken=token;
         await UserDataService.fetchUserData(token).then((userData) {
           userDataJson = jsonDecode(userData);
+          print("user data is ");
+          print(userDataJson);
         });
         print(userDataJson);
         await AddressTracker.addressTracker();
@@ -94,15 +98,38 @@ class _MyLoginState extends State<MyLogin> {
           print('runnong usr address');
           userAddress = userAddressJson["address"];
         }
+
         print("address detail is ");
         print(userDataJson["id"]);
         if (!context.mounted) return;
         if(role=="Buyers"){
           Navigator.pushNamed(context, 'homePage');
         }
-        else if(role=="Sellers"){
+        else if (role == "Sellers") {
+          await UserDataService.fetchStoreData(token).then((storeData) {
+            storeDataJson = jsonDecode(storeData);
+            print("store data is ");
+            print(storeDataJson);
+          });
+          await AddressTracker.storeAddressTracker();
+          await StoreProfileCompletionTracker.storeProfileCompletionTracker();
+          print("store address check ");
+          print(  isStoreProfileCompleted);
+          print(isStoreAddressCompleted);
+          if (isStoreAddressCompleted == true && storeDataJson.isNotEmpty) {
+            // Assuming you're getting store data as a list of stores
+            var storeId = storeDataJson[0]["id"];
+            print(storeId);
+            await StoreAddressService.fetchStoreAddress(storeId).then((storeAddress) {
+              storeAddressJson = jsonDecode(storeAddress);
+            });
+            print('running store address');
+            storeAddress = storeAddressJson["address"];
+            print(storeAddress);
+          }
           Navigator.pushNamed(context, 'sellerHomePage');
         }
+
       } else {
         if (!context.mounted) return;
         showDialog(
