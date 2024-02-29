@@ -20,7 +20,7 @@ public class AddressService {
     AddressRepository addressRepository;
 
     private final String geocodeApiUrl = "https://geocode.maps.co/reverse?lat={lat}&lon={lon}&api_key={api_key}";
-    private final String apiKey = "65d8c939a4832240123201dczefef51";
+    private final String apiKey = "your api key";
 
     public String getAddress(String latitude, String longitude) {
         RestTemplate restTemplate = new RestTemplate();
