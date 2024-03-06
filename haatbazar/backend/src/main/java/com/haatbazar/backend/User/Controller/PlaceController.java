@@ -35,7 +35,7 @@ public class PlaceController {
 
         // Construct the URL with query parameters
         String apiUrl = "https://map-places.p.rapidapi.com/queryautocomplete/json";
-        String rapidApiKey = "1b09ca83e0msh4abf69ebd3368d8p11843djsn23b3cb67ff4e";
+        String rapidApiKey = "api key";
         String rapidApiHost = "map-places.p.rapidapi.com";
         String location = "Bharati";
         int radius = 50000;
