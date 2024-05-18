@@ -1,136 +1,188 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/Model/StoreAddress.dart';
+import 'package:hatbazarsample/ProductCard/individualProductOverview.dart';
+import 'package:hatbazarsample/SellerCenter/Product%20Detail/product_detail_home.dart';
 import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 import 'package:hatbazarsample/Widgets/bigText.dart';
 import 'package:hatbazarsample/Widgets/smallText.dart';
 
 import '../ProductListPage/ProductListCat.dart';
+import '../Services/get_imageBy_product_name.dart';
+import '../main.dart';
+
 
 class Product {
   final String name;
-  final String imagePath;
   final double rating;
-  final String price;
+  final double price;
+  final String priceUnit;
+  final int storeId;
+  final String availableQty;
 
-  Product({required this.name, required this.imagePath, required this.rating, required this.price});
+
+  Product({required this.name,required this.storeId,required this.priceUnit, required this.rating, required this.price,required this.availableQty});
 }
 
-class ProductWidget extends StatelessWidget {
-  final List<Product> products; // This list would be populated from the backend
+class ProductWidget extends StatefulWidget {
 
-  const ProductWidget({super.key, required this.products});
+  final List<Product> products;
+
+
+  const ProductWidget({Key? key, required this.products}) : super(key: key);
+
+  @override
+  _ProductWidgetState createState() => _ProductWidgetState();
+}
+
+class _ProductWidgetState extends State<ProductWidget> {
+  List<String> productImages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProductImages();
+  }
+  Uint8List decodeBase64ToUint8List(String base64String) {
+    String base64Data = base64String.split(',').last;
+    return base64.decode(base64Data);
+  }
+  Future<void> fetchProductImages() async {
+    imageBytesList=[];
+    try {
+      for (var product in widget.products) {
+        final images = await ImageFetcherService.fetchProductImages(product.name);
+        productImages.addAll(images);
+        for (var base64Image in images) {
+          Uint8List imageBytes = decodeBase64ToUint8List(base64Image);
+          imageBytesList.add(imageBytes);
+        }
+      }
+      setState(() {});
+    } catch (e) {
+      print('Error fetching product images: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> rows = [];
-
-    for (int i = 0; i < products.length; i += 2) {
-      // Create a row with at most 2 columns
-      List<Widget> columns = [];
-
-      for (int j = i; j < i + 2 && j < products.length; j++) {
-        columns.add(
-          Expanded(
-            child: GestureDetector(
-              onTap: (){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Display the product using imageBytesList at index 0
+        if (widget.products.isNotEmpty)
+          GestureDetector(
+            onTap: () {
+              if(role=="Sellers"){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>  ProductDetail(proName:widget.products[0].name),
+                  ),
+                );
+              }
+              else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ProductListCat(),
                   ),
                 );
-                print("tapped");
-              },
+              }
+              print("tapped");
+            },
+            child: Container(
+              margin: EdgeInsets.only(right: ResponsiveDim.width15),
+              decoration: BoxDecoration(
+                color: const Color(0xB7F8F5EF),
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    margin: EdgeInsets.only(right: ResponsiveDim.width30),
-                    decoration: BoxDecoration(
-                      color:  const Color(0xB7F8F5EF),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: ResponsiveDim.screenHeight / 5.5,
+                  Row(
+                    children: [
+                      Container(
+                          width: ResponsiveDim.screenHeight / 5,
                           height: ResponsiveDim.screenHeight / 5.5,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
-                            image: DecorationImage(
+                            image: productImages.isNotEmpty
+                                ? DecorationImage(
                               fit: BoxFit.cover,
-                              image: AssetImage(products[j].imagePath),
-                            ),
+                              image: MemoryImage(base64Decode(productImages.first.replaceAll('data:image/png;base64,', ''))),
+                            )
+                                : null,
                           ),
-                        ),
-                        SizedBox(height: ResponsiveDim.screenHeight / 445.142),
-                        BigText(
-                          text: products[j].name,
-                          wrap: true,
-                        ),
-                        Row(
+                          child: productImages.isEmpty
+                              ? Center(child: CircularProgressIndicator()) // Show CircularProgressIndicator if image is loading
+                              : null
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Wrap(
+                            BigText(
+                              text: widget.products[0].name,
+                              wrap: true,
+                            ),
+                            SizedBox(height: ResponsiveDim.height5,),
+                            Row(
                               children: [
-                                // Filled stars for the integer part
-                                ...List.generate(
-                                  products[j].rating.toInt(),
-                                      (index) => Icon(Icons.star, color: Colors.cyan, size: ResponsiveDim.height15),
+                                Wrap(
+                                  children: [
+                                    // Filled stars for the integer part
+                                    ...List.generate(
+                                      widget.products[0].rating.toInt(),
+                                          (index) => Icon(Icons.star, color: Colors.cyan, size: ResponsiveDim.height15),
+                                    ),
+                                    // Partially filled star for the decimal part
+                                    if (widget.products[0].rating % 1 > 0) // Check if there is a decimal part
+                                      Icon(
+                                        Icons.star_half,
+                                        color: Colors.cyan,
+                                        size: ResponsiveDim.height15,
+                                      ),
+                                    // Empty stars for the remaining part (if any)
+                                    ...List.generate(
+                                      (5 - widget.products[0].rating).toInt(), // Assuming a total of 5 stars
+                                          (index) => Icon(Icons.star_border, color: Colors.cyan, size: ResponsiveDim.height15),
+                                    ),
+                                  ],
                                 ),
-                                // Partially filled star for the decimal part
-                                if (products[j].rating % 1 > 0) // Check if there is a decimal part
-                                  Icon(
-                                    Icons.star_half,
-                                    color: Colors.cyan,
-                                    size: ResponsiveDim.height15,
-                                  ),
-                                // Empty stars for the remaining part (if any)
-                                ...List.generate(
-                                  (5 - products[j].rating).toInt(), // Assuming a total of 5 stars
-                                      (index) => Icon(Icons.star_border, color: Colors.cyan, size: ResponsiveDim.height15),
-                                ),
+                                SizedBox(width: ResponsiveDim.width10),
+                                SmallText(text: "${widget.products[0].rating}/5"),
+                                SizedBox(width: ResponsiveDim.width10),
                               ],
                             ),
-
-                            SizedBox(width: ResponsiveDim.width10),
-                            SmallText(text: "${products[j].rating}/5"),
-                            SizedBox(width: ResponsiveDim.width10),
+                            SizedBox(height: ResponsiveDim.height5,),
+                            BigText(
+                              text: 'Rs ${widget.products[0].price} / ${widget.products[0].priceUnit}',
+                              size: ResponsiveDim.height20,
+                              weight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                            SizedBox(height: ResponsiveDim.height5,),
+                            SmallText(
+                              text: 'Available Qty:  ${widget.products[0].availableQty} ${widget.products[0].priceUnit}',
+                              size: ResponsiveDim.height15,
+                              color: Colors.black,
+                              overFlow: TextOverflow.ellipsis,
+                            ),
                           ],
                         ),
-                        BigText(
-                          text: 'Rs ${products[j].price} /kg',
-                          size: ResponsiveDim.height20,
-                          weight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-
-                      ],
-                    ),
+                      )
+                    ],
                   ),
-                  SizedBox(height: ResponsiveDim.height15,),
+
+
                 ],
               ),
             ),
-
           ),
-
-        );
-      }
-
-      // Add the row to the list of rows
-      rows.add(
-        Row(
-          children: columns,
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Other scrollable content above the product cards
-        ...rows,
-
-
       ],
     );
   }

@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hatbazarsample/Feed/feed_main.dart';
+import 'package:hatbazarsample/SellerCenter/HomePage/seller_landing_page.dart';
 import 'package:hatbazarsample/SellerCenter/HomePage/toDoListSeller.dart';
+import 'package:hatbazarsample/SellerCenter/Tools/seller_tools.dart';
+import '../../Utilities/colors.dart';
+import '../../main.dart';
+
+class MyController extends GetxController {
+  var isAddProductCompleted = false.obs;
+}
 
 class SellerBottomNavigation extends StatefulWidget {
-  const SellerBottomNavigation({super.key});
+  const SellerBottomNavigation({Key? key}) : super(key: key);
 
   @override
   _SellerBottomNavigationState createState() => _SellerBottomNavigationState();
@@ -10,69 +20,66 @@ class SellerBottomNavigation extends StatefulWidget {
 
 class _SellerBottomNavigationState extends State<SellerBottomNavigation> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    //body
-    SingleChildScrollView(
-      child: ToDoListSeller(),
-    ),
-    Text(
-      'Tools',
-      style: optionStyle,
-    ),
-    Text(
-      'Messages',
-      style: optionStyle,
-    ),
-
-    Text(
-      'Data',
-      style: optionStyle,
-    ),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  final MyController _controller = Get.put(MyController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: GetBuilder<MyController>(
+        builder: (controller) {
+          // Check if all conditions are met
+          bool allConditionsMet = isProfileCompleted &&
+              isAddAddressCompleted &&
+              isAddStoreCompleted &&
+              isAddProductCompleted;
+          List<Widget> _widgetOptions = <Widget>[
+            SingleChildScrollView(
+              child: allConditionsMet ? SellerLandingPage() : ToDoListSeller(),
+            ),
+            const    SellerTools() ,
+            const Text(
+              'Messages',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+            const SingleChildScrollView(
+              child:   FeedMain(),
+            ),
+          ];
+
+          // Return different widgets based on condition
+          return _widgetOptions.elementAt(allConditionsMet ? _selectedIndex : 0);
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.primaryColor,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Tools',
-            backgroundColor: Colors.purple,
+            backgroundColor: AppColors.primaryColor
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.messenger),
-            label: 'messages',
-            backgroundColor: Colors.pink,
+            label: 'Messages',
+            backgroundColor:AppColors.primaryColor,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.data_exploration),
-            label: 'Data',
-            backgroundColor: Colors.blue,
+            icon: Icon(Icons.newspaper),
+            label: 'Feed',
+            backgroundColor: AppColors.primaryColor,
           ),
-
-
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.amber[500],
-        onTap: _onItemTapped,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
       ),
     );
   }

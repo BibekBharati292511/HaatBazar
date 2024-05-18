@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/MyOrdersAndHistory/order_and_history_main.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -6,7 +7,7 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
-    double textHeightPercentage = 0.006; // Adjust this value based on your needs
+    double textHeightPercentage = 0.006;
 
     return ListView(
       padding: EdgeInsets.zero,
@@ -16,7 +17,7 @@ class MainDrawer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Gmail",
+                "Haat-Bazar",
                 style: TextStyle(
                   fontSize: 25.0,
                   fontWeight: FontWeight.w500,
@@ -28,55 +29,103 @@ class MainDrawer extends StatelessWidget {
           ),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            // Navigate to Home page
+            Navigator.pushNamed(context, 'homePage');
+          },
           leading: const Icon(
-            Icons.inbox,
+            Icons.home,
             color: Colors.black,
           ),
-          trailing: const Text("99+"),
-          title: const Text("Inbox"),
+          title: const Text("Home"),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            // Navigate to Profile page
+
+          },
           leading: const Icon(
-            Icons.star_border,
+            Icons.person,
             color: Colors.black,
           ),
-          title: const Text("Starred"),
+          title: const Text("Profile"),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+
+          },
           leading: const Icon(
-            Icons.snooze,
+            Icons.newspaper,
             color: Colors.black,
           ),
-          title: const Text("Snoozed"),
+          title: const Text("News"),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>const OrderAndHistoryMainPage()));
+          },
           leading: const Icon(
-            Icons.label_important,
+            Icons.shopping_bag_outlined,
             color: Colors.black,
           ),
-          title: const Text("Important"),
+          title: const Text("My Orders"),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            // Navigate to Help section
+          },
           leading: const Icon(
-            Icons.inbox,
+            Icons.help_outline,
             color: Colors.black,
           ),
-          title: const Text("Draft"),
+          title: const Text("Help"),
         ),
         ListTile(
-          onTap: () {},
+          onTap: () {
+            // Navigate to Accessibility options
+          },
           leading: const Icon(
-            Icons.inbox,
+            Icons.accessibility,
             color: Colors.black,
           ),
-          title: const Text("Sent"),
+          title: const Text("Accessibility"),
+        ),
+        ListTile(
+          onTap: () {
+            // Logout functionality
+            _logout(context);
+          },
+          leading: const Icon(
+            Icons.logout,
+            color: Colors.black,
+          ),
+          title: const Text("Logout"),
         ),
       ],
+    );
+  }
+  void _logout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Logout"),
+          content: Text("Are you sure you want to log out?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                Navigator.pushNamed(context, 'login'); // Logout
+              },
+              child: Text("Logout"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

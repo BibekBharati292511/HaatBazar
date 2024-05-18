@@ -1,38 +1,125 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hatbazarsample/Utilities/constant.dart';
+import 'package:hatbazarsample/main.dart';
 
 import '../../../Model/DeliveryOptions.dart';
+import '../../../Model/ProfileCompletionTracker.dart';
+import '../../../Model/UserAddress.dart';
+import '../../../Model/UserData.dart';
+import '../../../Model/addressTracker.dart';
 import '../../../Utilities/ResponsiveDim.dart';
+import '../../../Widgets/alertBoxWidget.dart';
 import '../../../Widgets/custom_button.dart';
 import '../../../Widgets/loginBackgroundImage.dart';
 import '../../../Widgets/login_container.dart';
+import 'package:http/http.dart' as http;
+late ValueNotifier<Set<String>> _selectedOptionsController;
 
 class storeDeliveryOptions extends StatefulWidget {
   const storeDeliveryOptions({Key? key}) : super(key: key);
 
   @override
   State<storeDeliveryOptions> createState() => _storeDeliveryOptionsState();
+
 }
 
 class _storeDeliveryOptionsState extends State<storeDeliveryOptions> {
-  late ValueNotifier<Set<String>> _selectedOptionsController;
   Set<String> _selectedOptions = {};
   String? _selectedDescription;
   late Future<List<StoreDeliveryOptions>> _deliveryOptionsFuture;
+  Future<List<String>?> fetchStoreDeliveryOptions() async {
+    final url = Uri.parse('${serverBaseUrl}storeDeliveryOptions/add');
+    final payload = {
+      "deliveryOptions": _selectedOptionsController.value.toList(),
+      "token": userToken,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode(payload),
+    );
+
+    if (response.statusCode == 200) {
+
+      final List<String> options = [];
+      final responseData = json.decode(response.body);
+      // Extract options from responseData and add to options list
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext dialogContext) {
+          return MyAlertDialog(
+            title: 'Success',
+            content: "Delivery options added successfully",
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  await ProfileCompletionTracker.profileCompletionTracker();
+                  await AddressTracker.addressTracker();
+                  await UserDataService.fetchUserData(userToken!).then((
+                      userData) {
+                    userDataJson = jsonDecode(userData);
+                  });
+                  await UserAddressService.fetchUserAddress(userDataJson["id"]).then((userAddress) {
+                    userAddressJson = jsonDecode(userAddress);
+                  });
+                  userAddress=userAddressJson["address"];
+                  Navigator.pushNamed(context, 'addStore');
+                  isStoreAddressCompleted=true;
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          );
+        },
+      );
+      return options;
+    }
+    else if(response.statusCode == 400){
+      print("hepp here");
+      print("hepp here");
+      print(userDataJson["id"]);
+      Map<String, dynamic> responseData = jsonDecode(response.body);
+      // if (!context.mounted) return;
+      //if (responseData['status'] == 'Error') {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (BuildContext dialogContext) {
+            return MyAlertDialog(
+              title: 'Error',
+              content: responseData['message'],
+            );
+          },
+        );
+    }
+    else {
+      throw Exception('Failed to fetch delivery options');
+    }
+    return null;
+  }
 
   @override
   void initState() {
     super.initState();
     _selectedOptionsController = ValueNotifier<Set<String>>({});
-    _deliveryOptionsFuture = fetchDeliveryOptions();
+    _deliveryOptionsFuture = fetchDeliveryOptions() ;
   }
   @override
   void dispose() {
     _selectedOptionsController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
+
+
     return SafeArea(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -147,11 +234,16 @@ class _storeDeliveryOptionsState extends State<storeDeliveryOptions> {
   Widget buildSignInButton() {
     return CustomButton(
         buttonText: 'Save',
-        onPressed: () {
+        onPressed: () async{
           if (_selectedOptions.isNotEmpty) {
             // If no option is selected, set the default option here
             // _selectedOptions.add(deliveryOptions.first.deliveryOptions!);
-            print(_selectedOptionsController);
+            print(_selectedOptionsController.value);
+            print("present sir");
+            print(storeDataJson[0]["id"]);
+            await fetchStoreDeliveryOptions();
+            await AddressTracker.storeDeliveryTracker();
+            addStoreStatsChecker();
           }
           // Handle save action here
         });

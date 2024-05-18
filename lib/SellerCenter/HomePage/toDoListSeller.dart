@@ -47,9 +47,7 @@ class _ToDoListSellerState extends State<ToDoListSeller> {
                     SizedBox(height: ResponsiveDim.height10),
                     ButtonContainer(number: "3", text: "Add Store",tracker: isAddStoreCompleted,),
                     SizedBox(height: ResponsiveDim.height10),
-                    ButtonContainer(number: "4", text: "Add Bank Account",tracker: isAddBankAccountCompleted,),
-                    SizedBox(height: ResponsiveDim.height10),
-                    ButtonContainer(number: "5", text: "Add a product",tracker: isAddProductCompleted,),
+                    ButtonContainer(number: "4", text: "Add a product",tracker: isAddProductCompleted,),
                   ],
                 ),
               ),
@@ -206,9 +204,8 @@ class ButtonContainer extends StatelessWidget {
                     case "Add Store":
                       Navigator.pushNamed(context, 'addStore');
                       break;
-                    case "Add Bank Account":
-                      break;
                     case "Add a product":
+                      Navigator.pushNamed(context, 'addProduct');
                       break;
                     default:
                     // Handle other cases if needed

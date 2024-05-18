@@ -4,6 +4,7 @@ import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 class BigText extends StatelessWidget {
   final Color? color;
   final String text;
+  final int? maxLine;
   double size;
   FontWeight? weight;
   final bool? wrap;
@@ -12,6 +13,7 @@ class BigText extends StatelessWidget {
 
   BigText({super.key, this.color = const Color(0xFF332d2b),
     required this.text,
+    this.maxLine,
     this.size = 0,
     this.overflow = TextOverflow.ellipsis,
     this.weight=FontWeight.w400,
@@ -21,6 +23,7 @@ class BigText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
+      maxLines:maxLine??1,
         text,
         overflow: overflow,
         softWrap:wrap,

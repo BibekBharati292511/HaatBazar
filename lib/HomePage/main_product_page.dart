@@ -1,10 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:hatbazarsample/HomePage/main_drawer.dart';
 import 'package:hatbazarsample/Utilities/colors.dart';
 import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 import 'package:hatbazarsample/Widgets/bigText.dart';
 import 'package:hatbazarsample/Widgets/smallText.dart';
 
+import '../AddToCart/cart_controller.dart';
+import '../Filter_And_Search/search_screen_delegate.dart';
+import '../Services/get_all_product.dart';
 import 'bottom_navigation.dart';
 
 class MainProductPage extends StatefulWidget {
@@ -15,8 +21,28 @@ class MainProductPage extends StatefulWidget {
 }
 
 class _MainProductPageState extends State<MainProductPage> {
+  late List<ProductDto> allProducts;
+  final CartController cartController = Get.find();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAllProducts();
+  }
+  Future<void> _fetchAllProducts() async {
+    allProducts = await fetchAllProduct(); // Fetch all products
+  }
+  void _openSearch() {
+    showSearch(
+      context: context,
+      delegate: ProductSearchDelegate(
+        allProducts: allProducts, // Pass product data to search delegate
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
+   // Get.put(CartController());
     print("height: ${MediaQuery.of(context).size.width}");
 
     return Scaffold(
@@ -54,26 +80,46 @@ class _MainProductPageState extends State<MainProductPage> {
               ],
             ),
             actions: [
-              Container(
-                margin: EdgeInsets.only(right: ResponsiveDim.width10),
-                child: Icon(
-                  Icons.shopping_cart,
-                  color: AppColors.primaryButtonColor,
-                  size: ResponsiveDim.icon44,
-                ),
-              ),
-              Container(
-                width: ResponsiveDim.width45,
-                height: ResponsiveDim.height45,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
-                  color: AppColors.primaryColor,
-                ),
-                margin: EdgeInsets.only(right: ResponsiveDim.width20),
-                child: Icon(
-                  Icons.search,
-                  color: AppColors.staticIconColor,
-                  size: ResponsiveDim.icon24,
+              Obx(() => Stack(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.shopping_cart,size: 35,),
+                    onPressed: () {
+                      Navigator.pushNamed(context, 'toCart');
+                    },
+                  ),
+                  if (cartController.cartItemCount.value > 0)
+                    Positioned(
+                      right: 0,
+                      child: CircleAvatar(
+                        radius: 10,
+                        backgroundColor: Colors.red,
+                        child: Text(
+                          cartController.cartItemCount.value.toString(),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+              )),
+              SizedBox(width: 5,),
+              GestureDetector(
+                onTap: (){
+                  _openSearch();
+                },
+                child: Container(
+                  width: ResponsiveDim.height35,
+                  height: ResponsiveDim.height35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                    color: AppColors.primaryColor,
+                  ),
+                  margin: EdgeInsets.only(right: ResponsiveDim.width20),
+                  child: Icon(
+                    Icons.search,
+                    color: AppColors.staticIconColor,
+                    size: ResponsiveDim.icon24,
+                  ),
                 ),
               ),
             ],
@@ -94,7 +140,9 @@ class _MainProductPageState extends State<MainProductPage> {
 
           //const BottomWidget(),
           const Expanded(
-            child: BottomWidget(),
+            child: Center(
+              child: BottomWidget(),
+            ),
           ),
         ],
       ),

@@ -45,6 +45,12 @@ class _AddStorePageState extends State<AddStorePage> {
                   AppBar(
                     backgroundColor: AppColors.backgroundColor,
                     title: const Text("Add Store"),
+                    leading: IconButton(
+                      icon: Icon(Icons.arrow_back), // The back button icon
+                      onPressed: () {
+                        Navigator.pushNamed(context, 'sellerHomePage'); // This will navigate back to the previous page
+                      },
+                    ),
                   ),
                   Container(
                     //   color: AppColors.backgroundColor,
@@ -92,25 +98,25 @@ class _AddStorePageState extends State<AddStorePage> {
                                 ButtonContainer(
                                   number: "3",
                                   text: "Add Delivery Option",
-                                  tracker: isAddStoreCompleted,
+                                  tracker: isStoreDeliveryOptionCompleted,
                                 ),
                                 SizedBox(height: ResponsiveDim.height10),
                                 ButtonContainer(
                                   number: "4",
                                   text: "Add Payment choice",
-                                  tracker: isAddBankAccountCompleted,
+                                  tracker: isStorePaymentOptionCompleted,
                                 ),
                                 SizedBox(height: ResponsiveDim.height10),
                                 ButtonContainer(
                                   number: "5",
                                   text: "Add Store Contact",
-                                  tracker: isAddBankAccountCompleted,
+                                  tracker:  isAddStoreNumberCompleted
                                 ),
                                 SizedBox(height: ResponsiveDim.height10),
                                 ButtonContainer(
                                   number: "6",
                                   text: "Add Store Image",
-                                  tracker: isAddBankAccountCompleted,
+                                  tracker: isAddStoreImageCompleted,
                                 ),
                                 SizedBox(height: ResponsiveDim.height45),
                                 const Text(
@@ -253,10 +259,40 @@ class ButtonContainer extends StatelessWidget {
 
                       break;
                     case "Add Payment choice":
+                      if(isStoreProfileCompleted) {
+                        Navigator.pushNamed(context, 'storePaymentOptions');
+                      }
+                      else{
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext dialogContext) {
+                            return MyAlertDialog(
+                              title: 'Error',
+                              content: "Create your store first",
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, 'storeType');
+                                  },
+                                  child: const Text('Ok'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+
                       break;
                     case "Add Store Contact":
+                      Navigator.pushNamed(context, 'createSellerAccount');
+                      fromUser=false;
+                      fromStore=true;
                       break;
                     case "Add Store Image":
+                      Navigator.pushNamed(context, 'editProfileImage');
+                      fromUser=false;
+                      fromStore=true;
                       break;
                     default:
                       // Handle other cases if needed

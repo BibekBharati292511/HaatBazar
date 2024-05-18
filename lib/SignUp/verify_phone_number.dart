@@ -6,6 +6,7 @@ import 'package:hatbazarsample/main.dart';
 
 import '../Model/ProfileCompletionTracker.dart';
 import '../Model/UserData.dart';
+import '../Model/storeTracker.dart';
 import '../Utilities/ResponsiveDim.dart';
 import '../Utilities/constant.dart';
 import '../Widgets/alertBoxWidget.dart';
@@ -68,8 +69,14 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                         userData) {
                       userDataJson = jsonDecode(userData);
                     });
-                    Navigator.pushNamed(context, 'sellerHomePage');
+                    if(role=="Technicians"){
+                      Navigator.pushNamed(context, 'technicianHome');
+                    }
+                    else {
+                      Navigator.pushNamed(context, 'sellerHomePage');
+                    }
                   },
+
                   child: const Text('Ok'),
                 ),
               ],
@@ -90,7 +97,73 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
       );
     }
   }
+  Future<void> setStorePhoneNumber(String otp) async {
+    final url = Uri.parse("${serverBaseUrl}store/verifyNumberOtp");
+    try {
+      final response = await http.post(
+        url,
+        headers: <String, String>{"Content-Type": "application/json"},
+        body: jsonEncode(<String, Object>{
+          "number":number!,
+          "otp":otp,
+          "token": userToken!,
+        }),
+      );
+      if (!context.mounted) return;
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
 
+        if (responseData['status'] == 'Error') {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Error',
+                content: responseData['message'],
+              );
+            },
+          );
+        }
+        else{
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Success',
+                content: "Number set successfully.",
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      await ProfileCompletionTracker.profileCompletionTracker();
+                      await UserDataService.fetchUserData(userToken!).then((
+                          userData) {
+                        userDataJson = jsonDecode(userData);
+                      });
+                      Navigator.pushNamed(context, 'addStore');
+                    },
+                    child: const Text('Ok'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } else {
+        throw Exception(response.body);
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext dialogContext) {
+          return MyAlertDialog(title: 'Error', content: 'Failed to set Number: $e');
+        },
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -174,12 +247,23 @@ class _VerifyPhoneNumberState extends State<VerifyPhoneNumber> {
                   CustomButton(
                     buttonText: "Continue",
                     onPressed: ()
-                      async {
+                      async  {
                       print(userEmail);
                       print(number);
                         String otp = otpController.text;
                         print(otp);
-                        await setPhoneNumber(otp);
+                        if(fromUser) {
+                          await setPhoneNumber(otp);
+                          print("From User");
+                        }
+                        if(fromStore){
+                          await setStorePhoneNumber(otp);
+                          print("From store");
+                          fromStore=true;
+                          await StoreNumberCompletionTracker.storeNumberCompletionTracker();
+
+
+                        }
                     },
                   ),
                 ],

@@ -2,14 +2,22 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:hatbazarsample/Model/UserAddress.dart';
 import 'package:hatbazarsample/Model/UserData.dart';
 import 'package:hatbazarsample/Model/addressTracker.dart';
 import 'package:hatbazarsample/Model/storeTracker.dart';
+import 'package:hatbazarsample/Services/get_product_by_storeID.dart';
 import 'package:http/http.dart' as http;
 
+import 'AddToCart/cart_controller.dart';
+import 'AgroTechnicians/ToDoTechnician/setting_services.dart';
 import 'Model/ProfileCompletionTracker.dart';
 import 'Model/StoreAddress.dart';
+import 'Notification/notification_service.dart';
+import 'Services/get_all_category.dart';
+import 'Services/get_all_product.dart';
 import 'Utilities/ResponsiveDim.dart';
 import 'Utilities/constant.dart';
 import 'Widgets/LoadingWidget.dart';
@@ -49,6 +57,7 @@ class MyLogin extends StatefulWidget {
 }
 
 class _MyLoginState extends State<MyLogin> {
+  final TechnicianSettingServices _service = TechnicianSettingServices();
   bool _passwordVisible = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -80,57 +89,84 @@ class _MyLoginState extends State<MyLogin> {
       final Map<String, dynamic> responseBody = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        String token = responseBody["token"] as String;
-        String role=responseBody["role"] as String;
+        print("response body here");
+         token = responseBody["token"] as String;
+         print("token is ");
+         print(token);
+         role=responseBody["role"] as String;
         userToken=token;
+
         await UserDataService.fetchUserData(token).then((userData) {
           userDataJson = jsonDecode(userData);
-          print("user data is ");
-          print(userDataJson);
+          bytes=base64Decode(userDataJson["image"]??'');
+         phone=userDataJson["phone_number"]??"";
+         print(phone);
+         userEmail =userDataJson["email"]??"";
+         name="${userDataJson["firstName"]} ${userDataJson["lastName"]}"??"";
         });
-        print(userDataJson);
+        await getNotificationCount(userEmail!);
         await AddressTracker.addressTracker();
         await ProfileCompletionTracker.profileCompletionTracker();
+        print(isAddAddressCompleted);
         if(isAddAddressCompleted==true) {
           await UserAddressService.fetchUserAddress(userDataJson["id"]).then((userAddress) {
             userAddressJson = jsonDecode(userAddress);
           });
-          print('runnong usr address');
           userAddress = userAddressJson["address"];
         }
 
-        print("address detail is ");
-        print(userDataJson["id"]);
-        if (!context.mounted) return;
         if(role=="Buyers"){
+          Get.put(CartController());
+          await fetchAllProduct();
+          await fetchAllCategories();
           Navigator.pushNamed(context, 'homePage');
         }
         else if (role == "Sellers") {
-          await UserDataService.fetchStoreData(token).then((storeData) {
-            storeDataJson = jsonDecode(storeData);
-            print("store data is ");
-            print(storeDataJson);
-          });
-          await AddressTracker.storeAddressTracker();
+          print("sellers");
           await StoreProfileCompletionTracker.storeProfileCompletionTracker();
-          print("store address check ");
-          print(  isStoreProfileCompleted);
-          print(isStoreAddressCompleted);
+          if(isStoreProfileCompleted) {
+            await UserDataService.fetchStoreData(token).then((storeData) {
+              storeDataJson = jsonDecode(storeData);
+            });
+            await AddressTracker.productTracker();
+            await AddressTracker.storeAddressTracker();
+          }
           if (isStoreAddressCompleted == true && storeDataJson.isNotEmpty) {
-            // Assuming you're getting store data as a list of stores
-            var storeId = storeDataJson[0]["id"];
-            print(storeId);
-            await StoreAddressService.fetchStoreAddress(storeId).then((storeAddress) {
+            print("at store addess completion check ");
+             storeId = storeDataJson[0]["id"];
+            await AddressTracker.storeDeliveryTracker();
+            await AddressTracker.storePaymentTracker();
+           // print(storeDataJson[0]["image"]);
+            await StoreAddressService.fetchStoreAddress(storeId!).then((storeAddress) {
               storeAddressJson = jsonDecode(storeAddress);
             });
-            print('running store address');
             storeAddress = storeAddressJson["address"];
-            print(storeAddress);
+            if(isAddProductCompleted) {
+              print("Fetcjomggggggggggggg");
+              await fetchProductByStoreId(storeId!);
+            }
           }
+          await StoreNumberCompletionTracker.storeNumberCompletionTracker();
+          await StoreImageCompletionTracker.storeImageCompletionTracker();
+          print("trackers here");
+          print(isProfileCompleted);
+          print(isAddAddressCompleted);
+          print(isAddStoreCompleted);
+          print(isAddProductCompleted);
+          addStoreStatsChecker();
           Navigator.pushNamed(context, 'sellerHomePage');
         }
 
-      } else {
+        else if(role=="Technicians"){
+          await _service.doesTechnicianSettingExist(token, context);
+          print(isTechnicianSetupCompleted);
+          print(isAddSettingsCompleted);
+          print("heree");
+          //Navigator.pushNamed(context, "toDoTechnician");
+          Navigator.pushNamed(context, "technicianHome");
+        }
+      }
+      else {
         if (!context.mounted) return;
         showDialog(
           context: context,
@@ -143,7 +179,9 @@ class _MyLoginState extends State<MyLogin> {
           },
         );
       }
+      if (!context.mounted) return;
     } on SocketException catch(e) {
+      if (!context.mounted) return;
       showDialog(
         context: context,
         barrierDismissible: true,
@@ -152,6 +190,7 @@ class _MyLoginState extends State<MyLogin> {
         },
       );
     } on HttpException catch (e) {
+      if (!context.mounted) return;
       showDialog(
         context: context,
         barrierDismissible: true,
@@ -327,12 +366,15 @@ class _MyLoginState extends State<MyLogin> {
             String email = emailController.text;
             userEmail=email;
             await signIn(email, password);
-             {
-              await UserDataService.fetchUserData(userToken!).then((userData) {
-                userDataJson = jsonDecode(userData);
-                bytes=base64Decode(userDataJson["image"]);
-              });
-            }
+            //  {
+            //    print("token is ");
+            //    print(token);
+            //   await UserDataService.fetchUserData(userToken!).then((userData) {
+            //     userDataJson = jsonDecode(userData);
+            //     print("Checking for image butes");
+            //     bytes=base64Decode(userDataJson["image"]??'');
+            //   });
+            // }
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF003F12),

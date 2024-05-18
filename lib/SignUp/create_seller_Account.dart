@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/Utilities/colors.dart';
 import 'package:hatbazarsample/Widgets/custom_button.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -68,121 +69,124 @@ class _CreateSellerAccountState extends State<CreateSellerAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            const LoginBackgroundImage(),
-            Center(
-              child: LoginContainer(
-                children: <Widget>[
-                  SizedBox(height: ResponsiveDim.height20,),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context); // Navigate to the previous page
-                        },
-                        child: const Icon(Icons.arrow_back),
+    return Scaffold(
+      backgroundColor: Colors.green,
+      body: SafeArea(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              const LoginBackgroundImage(),
+              Center(
+                child: LoginContainer(
+                  children: <Widget>[
+                    SizedBox(height: ResponsiveDim.height20,),
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context); // Navigate to the previous page
+                          },
+                          child: const Icon(Icons.arrow_back),
+                        ),
+                      ],
+                    ),
+                    Center(
+                      child:  Text(
+                        'Set Phone Number',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: ResponsiveDim.font24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ],
-                  ),
-                  Center(
-                    child:  Text(
-                      'Set Phone Number',
+                    ),
+                    SizedBox(height:  ResponsiveDim.height20),
+                    const ProgressIndicators(currentPage: 1, totalPages: 2),
+                    SizedBox(height:  ResponsiveDim.height20,),
+                    Text(
+                      "What's your mobile Number?",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: ResponsiveDim.font24,
+                        fontSize: ResponsiveDim.bigFont,
                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height:  ResponsiveDim.height20),
-                  const ProgressIndicators(currentPage: 1, totalPages: 2),
-                  SizedBox(height:  ResponsiveDim.height20,),
-                  Text(
-                    "What's your mobile Number?",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: ResponsiveDim.bigFont,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "poppins",
-                    ),
-                  ),
-                  Padding(
-                    padding:  EdgeInsets.symmetric(horizontal: ResponsiveDim.width20),
-                    child: Text(
-                      "A mobile number is helpful when buyers wants to contact you",
-                      style: TextStyle(
-                        color: Colors.black38,
-                        fontSize: ResponsiveDim.smallFont,
-                        fontWeight: FontWeight.normal,
                         fontFamily: "poppins",
                       ),
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: ResponsiveDim.width45, top: ResponsiveDim.height45,right: ResponsiveDim.width45),
-
-                        child: IntlPhoneField(
-                          decoration: InputDecoration(
-                            labelText: 'Phone Number',
-                            border: OutlineInputBorder(
-                              borderRadius:BorderRadius.circular(ResponsiveDim.radius30),
-                              borderSide: BorderSide(color: phoneNumberValid ? Colors.grey : Colors.redAccent),
-                            ),
-                          ),
-
-                          initialCountryCode: 'NP',
-                          onChanged: (phone) {
-                            setState(() {
-                              phoneNumber = phone.completeNumber;
-                              phoneNumberValid = true;
-                            });
-                          },
+                    Padding(
+                      padding:  EdgeInsets.symmetric(horizontal: ResponsiveDim.width20),
+                      child: Text(
+                        "A mobile number is helpful when buyers wants to contact you",
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: ResponsiveDim.smallFont,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: "poppins",
                         ),
                       ),
-                      if (!phoneNumberValid)
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
                         Padding(
-                          padding:  EdgeInsets.only(left: ResponsiveDim.width45),
-                          child: const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              "Enter mobile number",
-                              style: TextStyle(
-                                color: Colors.red,
+                          padding: EdgeInsets.only(left: ResponsiveDim.width45, top: ResponsiveDim.height45,right: ResponsiveDim.width45),
+      
+                          child: IntlPhoneField(
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              border: OutlineInputBorder(
+                                borderRadius:BorderRadius.circular(ResponsiveDim.radius30),
+                                borderSide: BorderSide(color: phoneNumberValid ? Colors.grey : Colors.redAccent),
+                              ),
+                            ),
+      
+                            initialCountryCode: 'NP',
+                            onChanged: (phone) {
+                              setState(() {
+                                phoneNumber = phone.completeNumber;
+                                phoneNumberValid = true;
+                              });
+                            },
+                          ),
+                        ),
+                        if (!phoneNumberValid)
+                          Padding(
+                            padding:  EdgeInsets.only(left: ResponsiveDim.width45),
+                            child: const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                "Enter mobile number",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  SizedBox(height: ResponsiveDim.height20,),
-                  CustomButton(
-                    buttonText: "continue",
-                    onPressed: () async{
-                      if (phoneNumber.isEmpty) {
-                        setState(() {
-                          phoneNumberValid = false;
-                        });
-                      } else {
-                        String toNumber=phoneNumber;
-                        print(toNumber);
-                        await sendNumberOtp(toNumber);
-                        print("Number is $phoneNumber");
-                        number=phoneNumber;
-                      }
-                    },
-                  ),
-                ],
+                      ],
+                    ),
+                    SizedBox(height: ResponsiveDim.height20,),
+                    CustomButton(
+                      buttonText: "continue",
+                      onPressed: () async{
+                        if (phoneNumber.isEmpty) {
+                          setState(() {
+                            phoneNumberValid = false;
+                          });
+                        } else {
+                          String toNumber=phoneNumber;
+                          print(toNumber);
+                          await sendNumberOtp(toNumber);
+                          print("Number is $phoneNumber");
+                          number=phoneNumber;
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hatbazarsample/main.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../Model/UserData.dart';
 import '../../../Utilities/ResponsiveDim.dart';
 import '../../../Utilities/constant.dart';
 import '../../../Widgets/alertBoxWidget.dart';
@@ -73,8 +74,11 @@ class _CreateStoreState extends State<CreateStore> {
                 content: "Store Created Successfully",
                 actions: [
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       isStoreProfileCompleted=true;
+                      await UserDataService.fetchStoreData(userToken!).then((storeData) {
+                        storeDataJson = jsonDecode(storeData);
+                      });
                       Navigator.pushNamed(context, 'addStore');
                     },
                     child: const Text('Ok'),
@@ -300,6 +304,7 @@ class _CreateStoreState extends State<CreateStore> {
             String description = descriptionController.text;
             // Proceed with store creation
             await createStore(storeName, description);
+            addStoreStatsChecker();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF003F12),

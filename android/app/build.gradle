@@ -1,7 +1,11 @@
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
     id "dev.flutter.flutter-gradle-plugin"
+}
+
+dependencies {
+    // Import the Firebase BoM
 }
 
 def localProperties = new Properties()
@@ -38,10 +42,11 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
 
-        minSdkVersion 20
+        minSdkVersion 33
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -51,8 +56,9 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-}
 
-flutter {
-    source '../..'
+
+    flutter {
+        source '../..'
+    }
 }

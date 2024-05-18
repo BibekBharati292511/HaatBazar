@@ -101,7 +101,7 @@ class LocationController extends GetxController implements GetxService{
         altitude: 1,
         heading: 1,
         speed:1,
-        speedAccuracy: 1);
+        speedAccuracy: 1, altitudeAccuracy: 1, headingAccuracy: 1);
     String _address=await getAddressfromGeoCode(
         LatLng(detail.result.geometry!.location.lat, detail.result.geometry!.location.lng)
     );
@@ -111,10 +111,10 @@ class LocationController extends GetxController implements GetxService{
     print(responseData);
     if(!mapController.isNull){
       mapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: LatLng(
-          detail.result.geometry!.location.lat,
-          detail.result.geometry!.location.lng
-        ),zoom: 17)
+          CameraPosition(target: LatLng(
+              detail.result.geometry!.location.lat,
+              detail.result.geometry!.location.lng
+          ),zoom: 17)
       ));
     }
 
@@ -138,7 +138,7 @@ class LocationController extends GetxController implements GetxService{
               altitude: 1,
               heading: 1,
               speed: 1,
-              speedAccuracy: 1);
+              speedAccuracy: 1, altitudeAccuracy: 1, headingAccuracy: 1);
         }
         else{
           _pickPosition=Position(
@@ -149,16 +149,16 @@ class LocationController extends GetxController implements GetxService{
               altitude: 1,
               heading: 1,
               speed: 1,
-              speedAccuracy: 1);
+              speedAccuracy: 1, altitudeAccuracy: 1, headingAccuracy: 1);
 
         }
         if(_changeAddress){
-           String _address=await getAddressfromGeoCode(
-             LatLng(position.target.latitude, position.target.longitude)
-           );
-           _placemark=Placemark(name: _address);
-           _pickPlaceMark=Placemark(name: _address);
-           print("place mark is ${_placemark}");
+          String _address=await getAddressfromGeoCode(
+              LatLng(position.target.latitude, position.target.longitude)
+          );
+          _placemark=Placemark(name: _address);
+          _pickPlaceMark=Placemark(name: _address);
+          print("place mark is ${_placemark}");
         }
         else{
           _changeAddress=true;
@@ -188,11 +188,11 @@ class LocationController extends GetxController implements GetxService{
         print(json.decode(response.body));
         final address = decodedResponse['display_name'];
         final address1=decodedResponse['address'];
-         country=address1['country'];
-         county=address1['county'];
-         final lat=decodedResponse['lat'];
-         latitude=double.tryParse(lat)!;
-         final lng=decodedResponse['lon'];
+        country=address1['country'];
+        county=address1['county'];
+        final lat=decodedResponse['lat'];
+        latitude=double.tryParse(lat)!;
+        final lng=decodedResponse['lon'];
         longitude=double.tryParse(lng)!;
         municipality=address1['municipality'];
         state=address1['state'];

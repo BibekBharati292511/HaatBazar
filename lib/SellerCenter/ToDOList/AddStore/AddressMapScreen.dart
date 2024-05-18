@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hatbazarsample/Model/StoreAddress.dart';
 import 'package:hatbazarsample/Model/addressTracker.dart';
 import 'package:hatbazarsample/SellerCenter/ToDOList/AddAddress/location_controller.dart';
 import 'package:get/get.dart';
@@ -93,16 +94,17 @@ class _MapScreenState extends State<StoreMapScreen> {
                       onPressed: () async {
                         await ProfileCompletionTracker.profileCompletionTracker();
                         await AddressTracker.addressTracker();
-                        await UserDataService.fetchUserData(userToken!).then((
+                        await UserDataService.fetchStoreData(userToken!).then((
                             userData) {
-                          userDataJson = jsonDecode(userData);
+                          storeDataJson = jsonDecode(userData);
                         });
-                        await UserAddressService.fetchUserAddress(userDataJson["id"]).then((userAddress) {
-                          userAddressJson = jsonDecode(userAddress);
+                        await StoreAddressService.fetchStoreAddress(storeDataJson[0]["id"]).then((userAddress) {
+                          storeAddressJson = jsonDecode(userAddress);
                         });
-                        userAddress=userAddressJson["address"];
+                       /// storeAddress=storeAddressJson[0]["address"];
                         Navigator.pushNamed(context, 'addStore');
                         isStoreAddressCompleted=true;
+
                       },
                       child: const Text('Ok'),
                     ),
@@ -218,6 +220,7 @@ class _MapScreenState extends State<StoreMapScreen> {
                       left: ResponsiveDim.width20,
                       right:ResponsiveDim.width20,
                       child: !isStoreAddressCompleted?CustomButton(buttonText: 'Add Address', onPressed: () async {
+                        addStoreStatsChecker();
                         await(setStoreAddress(Uri.parse("${serverBaseUrl}storeAddress/add"),http.post,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, storeDataJson[0]["id"]));
                       },width:250):CustomButton(buttonText: 'Set new Address', onPressed: () async {
                         await(setStoreAddress(Uri.parse("${serverBaseUrl}storeAddress/updateAddress"),http.put,locationController.country, locationController.county, locationController.latitude, locationController.longitude, locationController.municipality, locationController.state, locationController.cityDistrict, storeDataJson[0]["id"]));

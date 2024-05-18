@@ -16,6 +16,7 @@ class ProfileCompletionTracker {
       );
 
       if (response.statusCode == 200) {
+       // addTechnicianStatsChecker();
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         if (responseBody["status"] == "Success") {
           isProfileCompleted = true;

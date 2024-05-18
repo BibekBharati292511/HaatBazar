@@ -104,8 +104,17 @@ class _MapScreenState extends State<MapScreen> {
                           userAddressJson = jsonDecode(userAddress);
                         });
                         userAddress=userAddressJson["address"];
-                        Navigator.pushNamed(context, 'sellerHomePage');
-                        isAddAddressCompleted=true;
+                        if(role=="Technicians"){
+                          addTechnicianStatsChecker();
+                          isTechnicianSetupCompleted?
+
+                          Navigator.pop(context):
+                              Navigator.pushNamed(context, 'technicianHome');
+                        }
+                        else {
+                          Navigator.pushNamed(context, 'sellerHomePage');
+                          isAddAddressCompleted = true;
+                        }
                       },
                       child: const Text('Ok'),
                     ),

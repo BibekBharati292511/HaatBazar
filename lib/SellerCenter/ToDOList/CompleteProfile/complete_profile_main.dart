@@ -75,7 +75,7 @@ class _CompleteProfileMainSellerState extends State<CompleteProfileMainSeller> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back), // Back button icon
                 onPressed: () {
-                  Navigator.of(context).pop(); // Navigate back when back button is pressed
+                  Navigator.of(context).pop(); // Navigate back
                 },
                 color: AppColors.primaryButtonColor,
               ),

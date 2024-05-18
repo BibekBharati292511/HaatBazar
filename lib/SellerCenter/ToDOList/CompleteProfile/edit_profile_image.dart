@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hatbazarsample/Model/storeTracker.dart';
 import 'package:hatbazarsample/Utilities/colors.dart';
 import 'package:hatbazarsample/Utilities/constant.dart';
 import 'package:hatbazarsample/Utilities/iconButtonWithText.dart';
@@ -42,7 +43,6 @@ class _ImageUploadState extends State<ImageUpload> {
       // Encode the byte array as a Base64 string
        base64Image = base64Encode(imageBytes);
 
-      print("Base64 Image: $base64Image");
     }
   }
   Future<void> _saveImage( String base64Image) async {
@@ -83,13 +83,19 @@ class _ImageUploadState extends State<ImageUpload> {
               actions: [
                 TextButton(
                   onPressed: () async {
+                    addTechnicianStatsChecker();
                     await ProfileCompletionTracker.profileCompletionTracker();
                     await UserDataService.fetchUserData(userToken!).then((
                         userData) {
                       userDataJson = jsonDecode(userData);
                       bytes=base64Decode(userDataJson["image"]);
                     });
-                    Navigator.pushNamed(context, 'sellerHomePage');
+                    if(role=="Sellers") {
+                      Navigator.pushNamed(context, 'sellerHomePage');
+                    }
+                    else if(role=="Technicians"){
+                      Navigator.pushNamed(context, 'technicianHome');
+                    }
                   },
                   child: const Text('Ok'),
                 ),
@@ -98,6 +104,73 @@ class _ImageUploadState extends State<ImageUpload> {
           },
         );
       }
+      } else {
+        throw Exception(response.reasonPhrase);
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext dialogContext) {
+          return MyAlertDialog(title: 'Error', content: 'Failed to set image: $e');
+        },
+      );
+    }
+  }
+  Future<void> _saveStoreImage( String base64Image) async {
+    final url = Uri.parse("${serverBaseUrl}store/update");
+
+    try {
+      final response = await http.put(
+        url,
+        headers: <String, String>{"Content-Type": "application/json"},
+        body: jsonEncode(<String, Object>{
+          "image": base64Image,
+          "token": userToken!,
+        }),
+      );
+      if (!context.mounted) return;
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'Error') {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Error',
+                content: responseData['message'],
+              );
+            },
+          );
+        }
+        else{
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return MyAlertDialog(
+                title: 'Success',
+                content: "Image set successfully.",
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      await StoreImageCompletionTracker.storeImageCompletionTracker();
+                      await UserDataService.fetchStoreData(userToken!).then((
+                          storeData) {
+                        storeDataJson = jsonDecode(storeData);
+                        bytes=base64Decode(storeDataJson[0]["image"]);
+                      });
+                      addStoreStatsChecker();
+                      Navigator.pushNamed(context, 'addStore');
+                    },
+                    child: const Text('Ok'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
       } else {
         throw Exception(response.reasonPhrase);
       }
@@ -145,7 +218,15 @@ class _ImageUploadState extends State<ImageUpload> {
               TextButton(
                 onPressed: isImageSelected
                     ? () async {
-                  await _saveImage( base64Image);
+
+                  if(fromUser) {
+                    await _saveImage(base64Image);
+                  }
+                  else{
+                    await _saveStoreImage(base64Image);
+                    fromStore=true;
+                    //await StoreImageCompletionTracker.storeImageCompletionTracker();
+                  }
                 }
                     : null,
                 child: Text(
