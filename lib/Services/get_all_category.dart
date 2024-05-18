@@ -7,7 +7,7 @@ import '../ProductCard/product.dart';
 import '../main.dart' as main;
 
 Future<List<CategoryDto>> fetchAllCategories() async {
-  final url = Uri.parse('${serverBaseUrl}category/');
+  final url = Uri.parse('${serverBaseUrl}category/getALl');
   final response = await http.get(url);
 
   if (response.statusCode == 200) {

@@ -22,7 +22,10 @@ class Product {
   final int storeId;
   final String availableQty;
 
-
+  @override
+  String toString() {
+    return 'Product{name: $name, rating: $rating, price: $price, priceUnit: $priceUnit, storeId: $storeId, availableQty: $availableQty}';
+  }
   Product({required this.name,required this.storeId,required this.priceUnit, required this.rating, required this.price,required this.availableQty});
 }
 
@@ -36,6 +39,7 @@ class ProductWidget extends StatefulWidget {
   @override
   _ProductWidgetState createState() => _ProductWidgetState();
 }
+
 
 class _ProductWidgetState extends State<ProductWidget> {
   List<String> productImages = [];

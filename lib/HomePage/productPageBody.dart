@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:hatbazarsample/ProductCard/product.dart';
 import 'package:hatbazarsample/Services/get_all_category.dart';
 import 'package:hatbazarsample/Services/get_all_product.dart';
+import 'package:hatbazarsample/Services/sub_category_service.dart';
 import 'package:hatbazarsample/Utilities/colors.dart';
 import 'package:hatbazarsample/Utilities/ResponsiveDim.dart';
 import 'package:hatbazarsample/Widgets/bigText.dart';
 import 'package:hatbazarsample/Widgets/icon_and_text.dart';
 import 'package:hatbazarsample/Widgets/smallText.dart';
 
+import '../Model/CategoryService.dart';
+import '../Services/category_service.dart';
 import '../Utilities/iconButtonWithText.dart';
 import '../main.dart';
 List<List<Product>> selectedProductList = [];
@@ -21,6 +24,10 @@ class ProductPageBody extends StatefulWidget {
 }
 
 class _ProductPageBodyState extends State<ProductPageBody> {
+  final CategoryServices _categoryService = CategoryServices(); // Initialize CategoryService
+  late Future<List<Categorys>> _categories; // Future for storing categories
+  final SubCategoryService _subCategoryService=SubCategoryService();
+  late Future<List<SubCategory>> _subCategories;
   PageController pageController = PageController(viewportFraction: 0.85);
   var _currPageValue = 0.0;
   final double _scaleFactor = 0.8;
@@ -33,9 +40,12 @@ class _ProductPageBodyState extends State<ProductPageBody> {
   @override
   void initState() {
     super.initState();
+    _categories = _categoryService.getAllCategories();
+    _subCategories=_subCategoryService.getAllSubCategories();
     pageController.addListener(() {
       setState(() {
         _currPageValue = pageController.page!;
+       // _categories = _categoryService.getAllCategories();
        // fetchAllProduct();
         // print("curr value is "+_currPageValue.toString());
       });
@@ -50,6 +60,7 @@ class _ProductPageBodyState extends State<ProductPageBody> {
 
   @override
   Widget build(BuildContext context) {
+    print(productLists[0]);
     switch (selectedIndex) {
       case 0:
         print("case 0");
@@ -87,23 +98,24 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                     child: BigText(text: "Featured Products"),
                   ),
                 ),
-                SizedBox(height: ResponsiveDim.screenHeight / 445.142),
+                SizedBox(height: ResponsiveDim.height10),
                 SizedBox(
                   height: ResponsiveDim.pageView,
                   child: PageView.builder(
-                      controller: pageController,
-                      itemCount: 5,
-                      itemBuilder: (context, position) {
-                        return _buildPageItem(position);
-                      }),
-                )
+                    controller: pageController,
+                    itemCount: featuredProducts.length,
+                    itemBuilder: (context, position) {
+                      return _buildPageItem(position, featuredProducts[position]);
+                    },
+                  ),
+                ),
               ],
             ),
           ),
           SizedBox(height: ResponsiveDim.height10),
           //dots
           DotsIndicator(
-            dotsCount: 5,
+            dotsCount: featuredProducts.length,
             position: _currPageValue.round(),
             decorator: const DotsDecorator(
               color: Colors.black87, // Inactive color
@@ -112,15 +124,15 @@ class _ProductPageBodyState extends State<ProductPageBody> {
           ),
           //Categories based;
           SizedBox(height: ResponsiveDim.height10),
+          SizedBox(height: ResponsiveDim.height10),
           Container(
             color: AppColors.backgroundColor,
-            //  margin: EdgeInsets.only(top:responsiveDim.height45,bottom:responsiveDim.height15),
-            padding: EdgeInsets.only(
-                left: ResponsiveDim.width20, right: ResponsiveDim.width20),
+            padding: EdgeInsets.symmetric(horizontal: ResponsiveDim.width20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     BigText(
                       text: "Categories",
@@ -128,6 +140,7 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                     SmallText(
                       text: "All you need is here ",
                     ),
+                    SizedBox(height: 5,),
                   ],
                 ),
                 IconButtonWithText(
@@ -141,94 +154,139 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                   backgroundColor: Colors.white,
                   onPressed: () {
                     // Your button click logic here
-                    //  print('Button clicked!');
+                    // print('Button clicked!');
                   },
                 ),
               ],
             ),
           ),
-          //Categories card
           Container(
+            width: ResponsiveDim.screenWidth,
+            height: 5,
             color: AppColors.backgroundColor,
-            padding: EdgeInsets.only(top: ResponsiveDim.height10),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      height: ResponsiveDim.height310,
-                      width: MediaQuery.of(context).size.width,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: 10,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (_, index) {
-                          return Container(
-                            margin: EdgeInsets.symmetric(
-                                horizontal: ResponsiveDim
-                                    .radius15), // Adjust spacing between items
-      
-                            // Adjust the height to accommodate image and text
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(ResponsiveDim.radius15),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: ResponsiveDim.screenHeight / 7.4190,
-                                  height: ResponsiveDim.screenHeight /
-                                      7.4190, // Adjust the height for the image
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        ResponsiveDim.radius15),
-                                    image: const DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                          "assets/images/categories/vegetables.png"),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                    height: ResponsiveDim.screenHeight /
-                                        445.142), // Adjust spacing between image and text
-                                BigText(
-                                  text: 'vegetables',
-                                  size: ResponsiveDim.height20,
-                                ),
-                                Container(
-                                  width: ResponsiveDim.screenHeight / 7.4190,
-                                  height: ResponsiveDim.screenHeight /
-                                      7.4190, // Adjust the height for the image
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(
-                                        ResponsiveDim.radius15),
-                                    image: const DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                          "assets/images/categories/NonVeg.png"),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                    height: ResponsiveDim.screenHeight /
-                                        445.142), // Adjust spacing between image and text
-                                BigText(
-                                  text: 'Non-Veg',
-                                  size: ResponsiveDim.height20,
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
           ),
+          FutureBuilder<List<Categorys>>(
+            future: _categories,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // or any loading widget
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final categoriesList = snapshot.data;
+                return Container(
+                  color: AppColors.backgroundColor,
+                 // padding: EdgeInsets.only(top: ResponsiveDim.height10),
+                  child: SizedBox(
+                    height: 150,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                      itemCount: categoriesList?.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (_, index) {
+                        final category = categoriesList?[index];
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: ResponsiveDim.screenHeight / 7.4190,
+                                height: ResponsiveDim.screenHeight / 7.4190,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                                  child: Image.network(
+                                    category!.imageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: ResponsiveDim.screenHeight / 445.142),
+                              BigText(
+                                text: category!.categoryName,
+                                size: ResponsiveDim.height20,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+          FutureBuilder<List<SubCategory>>(
+            future: _subCategories,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // or any loading widget
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final categoriesList = snapshot.data;
+                return Container(
+                  color: AppColors.backgroundColor,
+                  // padding: EdgeInsets.only(top: ResponsiveDim.height10),
+                  child: SizedBox(
+                    height: 160,
+                    width: MediaQuery.of(context).size.width,
+                    child: ListView.builder(
+                      itemCount: categoriesList?.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (_, index) {
+                        final category = categoriesList?[index];
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 6),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: ResponsiveDim.screenHeight / 7.4190,
+                                height: ResponsiveDim.screenHeight / 7.4190,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(ResponsiveDim.radius15),
+                                  child: Image.network(
+                                    category!.imageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: ResponsiveDim.screenHeight / 445.142),
+                              BigText(
+                                text: category!.categoryName,
+                                size: ResponsiveDim.height20,
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+
+
+
+
+
+
           //slogan text
           Container(
             padding: EdgeInsets.only(
@@ -334,6 +392,7 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                                   ),
                                 ),
                               ),
+
                               SizedBox(
                                   height: ResponsiveDim.screenHeight / 445.142),
                             ],
@@ -398,8 +457,46 @@ class _ProductPageBodyState extends State<ProductPageBody> {
       ),
     );
   }
+  List<FeaturedProductModel> featuredProducts = [
+    FeaturedProductModel(
+      name: 'Cucumber',
+      image: 'assets/images/cucumber.png',
+      rating: 4.5,
+      reviews: 6,
+      status: 'Normal',
+      distance: '5.3 Km',
+      time: '1 hour',
+    ),
+    FeaturedProductModel(
+      name: 'Orange',
+      image: 'assets/images/orange.png',
+      rating: 3,
+      reviews: 4,
+      status: 'Normal',
+      distance: '1.2 Km',
+      time: '40 min',
+    ),
+    FeaturedProductModel(
+      name: 'Tomato',
+      image: 'assets/images/tomato.png',
+      rating: 4,
+      reviews: 7,
+      status: 'Normal',
+      distance: '0.8 Km',
+      time: '30 min',
+    ),
+    FeaturedProductModel(
+      name: 'Potato',
+      image: 'assets/images/potato.png',
+      rating: 4.2,
+      reviews: 5,
+      status: 'Normal',
+      distance: '1 Km',
+      time: '35 min',
+    ),
+  ];
 
-  Widget _buildPageItem(int idx) {
+  Widget _buildPageItem(int idx, FeaturedProductModel product) {
     Matrix4 matrix = Matrix4.identity();
     if (idx == _currPageValue.floor()) {
       var currScale = 1 - (_currPageValue - idx) * (1 - _scaleFactor);
@@ -436,9 +533,9 @@ class _ProductPageBodyState extends State<ProductPageBody> {
               color: idx.isEven
                   ? const Color(0xFF69c5df)
                   : const Color(0xFF9294cc),
-              image: const DecorationImage(
+              image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage("assets/images/orange.png"),
+                image: AssetImage(product.image),
               ),
             ),
           ),
@@ -449,7 +546,8 @@ class _ProductPageBodyState extends State<ProductPageBody> {
               margin: EdgeInsets.only(
                   left: ResponsiveDim.width30,
                   right: ResponsiveDim.width30,
-                  bottom: ResponsiveDim.height20),
+                  bottom: ResponsiveDim.height5
+              ),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(ResponsiveDim.radius30),
                   color: AppColors.productCardBgColor,
@@ -475,7 +573,7 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    BigText(text: "Orange"),
+                    BigText(text: product.name),
                     SizedBox(
                       height: ResponsiveDim.height10,
                     ),
@@ -484,40 +582,40 @@ class _ProductPageBodyState extends State<ProductPageBody> {
                         Wrap(
                           children: List.generate(
                               5,
-                              (index) => Icon(
-                                    Icons.star,
-                                    color: Colors.cyan,
-                                    size: ResponsiveDim.height15,
-                                  )),
+                                  (index) => Icon(
+                                Icons.star,
+                                color: Colors.cyan,
+                                size: ResponsiveDim.height15,
+                              )),
                         ),
                         SizedBox(
                           width: ResponsiveDim.width10,
                         ),
-                        SmallText(text: "4.5"),
+                        SmallText(text: product.rating.toString()),
                         SizedBox(
                           width: ResponsiveDim.width10,
                         ),
-                        SmallText(text: "32 Reviews"),
+                        SmallText(text: "${product.reviews} Reviews"),
                       ],
                     ),
                     SizedBox(
                       height: ResponsiveDim.height20,
                     ),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconAndWidget(
                           icon: Icons.circle_sharp,
-                          text: "Normal",
+                          text: product.status,
                           iconColor: AppColors.primaryColor,
                         ),
                         IconAndWidget(
                             icon: Icons.location_on,
-                            text: "1.2 Km",
+                            text: product.distance,
                             iconColor: AppColors.primaryColor),
                         IconAndWidget(
                             icon: Icons.access_time_rounded,
-                            text: "40 min",
+                            text: product.time,
                             iconColor: AppColors.redColor)
                       ],
                     ),
@@ -530,4 +628,25 @@ class _ProductPageBodyState extends State<ProductPageBody> {
       ),
     );
   }
+
 }
+class FeaturedProductModel {
+  final String name;
+  final String image;
+  final double rating;
+  final int reviews;
+  final String status;
+  final String distance;
+  final String time;
+
+  FeaturedProductModel({
+    required this.name,
+    required this.image,
+    required this.rating,
+    required this.reviews,
+    required this.status,
+    required this.distance,
+    required this.time,
+  });
+}
+
