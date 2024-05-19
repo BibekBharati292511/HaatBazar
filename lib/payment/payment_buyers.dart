@@ -81,12 +81,10 @@ void khaltiPaymentBuyers(
           "",
           false,
         );
-        if(context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Payment Successful"),
                 backgroundColor: Colors.green),
           );
-        }
 
         showRatingDialog(context, order.orderItems,sellerName,order);
       }

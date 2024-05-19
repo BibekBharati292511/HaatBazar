@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:hatbazarsample/HomePage/main_drawer.dart';
@@ -28,6 +29,7 @@ class _MainProductPageState extends State<MainProductPage> {
   void initState() {
     super.initState();
     _fetchAllProducts();
+   // _notificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
   }
   Future<void> _fetchAllProducts() async {
     allProducts = await fetchAllProduct(); // Fetch all products

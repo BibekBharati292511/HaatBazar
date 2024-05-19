@@ -34,11 +34,13 @@ import 'package:hatbazarsample/SignUp/verify_phone_number.dart';
 import 'package:hatbazarsample/login.dart';
 import 'package:hatbazarsample/HomePage/main_product_page.dart';
 import 'package:khalti_flutter/khalti_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 
 import 'AddToCart/add_to_cart_page.dart';
 import 'AddToCart/cart_controller.dart';
 import 'ForgetPassword/sendEmailVerification.dart';
+import 'Notification/push_notification_trial.dart';
 import 'ProductCard/product.dart';
 import 'SellerCenter/Product Detail/product_detail_home.dart';
 import 'SellerCenter/ToDOList/AddStore/create_store.dart';
@@ -144,11 +146,14 @@ addTechnicianStatsChecker(){
 bool isUploadingToCloudinary=false;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await  LocalNotifications.init();
+  requestPermissions();
   Get.put(LocationController());
   runApp( KhaltiScope(
       publicKey: "test_public_key_3fc977f795ac4d918866ca2001d44d59",
       enabledDebugging: true,
       builder: (context, navKey) {
+
     return GetMaterialApp(
       navigatorKey: navKey,
       debugShowCheckedModeBanner: false,
@@ -202,4 +207,21 @@ Future<void> main() async {
   );}));
 
 
+}
+Future<void> requestPermissions() async {
+  // Request location permission
+  if (await Permission.location
+      .request()
+      .isDenied) {
+
+  }
+
+  if(await Permission.notification.request().isDenied){
+  }
+  // Request storage permission
+  if (await Permission.storage
+      .request()
+      .isDenied) {
+    //an show a dialog or toast here to inform the user about the importance of storage permission.
+  }
 }

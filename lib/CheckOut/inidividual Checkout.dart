@@ -15,6 +15,7 @@ import 'package:hatbazarsample/Widgets/smallText.dart';
 import '../AddToCart/Cart_Item.dart';
 import '../AddToCart/add_to_cart_page.dart';
 import '../AddToCart/cart_controller.dart';
+import '../Notification/push_notification_trial.dart';
 import '../OrderTracking/Order.dart';
 import '../OrderTracking/order_tracking_dart.dart';
 import '../OrderTracking/store_order_tracking.dart';
@@ -238,7 +239,13 @@ class _IndividualCheckOutState extends State<IndividualCheckOut> {
           content: Text(message),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
+                await LocalNotifications.init();
+                LocalNotifications.showSimpleNotification(
+                  title: 'Order Request',
+                  body: 'You have got a new order request from the user',
+                  payload: 'Payload from Another Page', // This payload will be sent when the notification is tapped
+                );
                 Navigator.pop(context);
               },
               child: Text(buttonText),
